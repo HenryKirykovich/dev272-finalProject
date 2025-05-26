@@ -1,45 +1,62 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+// ✅ Updated navigation and login/logout/profile logic
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Stack } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { supabase } from '..//../lib/supabase';
+import { useEffect, useState } from 'react';
+import { TouchableOpacity, Text, View } from 'react-native';
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
+  const [fullName, setFullName] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setIsLoggedIn(false);
+        return;
+      }
+      setIsLoggedIn(true);
+      const { data } = await supabase
+        .from('users')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+      if (data) setFullName(data.full_name || '');
+    };
+    fetchProfile();
+  }, []);
 
   return (
-    <Tabs
+    <Stack
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+        headerLeft: () =>
+          isLoggedIn ? (
+            <TouchableOpacity
+              onPress={async () => {
+                await supabase.auth.signOut();
+                setIsLoggedIn(false);
+                router.replace('/(auth)/login');
+              }}
+              style={{ marginLeft: 14 }}
+            >
+              <Text style={{ color: 'white' }}>Logout</Text>
+            </TouchableOpacity>
+          ) : null,
+        headerRight: () =>
+          isLoggedIn ? (
+            <TouchableOpacity
+              onPress={() => router.push('/(auth)/profile-form')}
+              style={{ marginRight: 14 }}
+            >
+              <Text style={{ color: 'white' }}>Profile {fullName}</Text>
+            </TouchableOpacity>
+          ) : null,
+        headerStyle: { backgroundColor: '#222' },
+        headerTintColor: '#fff',
+      }}
+    />
   );
 }

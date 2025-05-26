@@ -1,3 +1,4 @@
+// app/(auth)/profile-form.tsx
 import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -6,16 +7,17 @@ import { supabase } from '../../lib/supabase';
 export default function ProfileForm() {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [alreadyExists, setAlreadyExists] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const checkExisting = async () => {
+    const fetchProfile = async () => {
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
-
-      if (!user) return;
+      if (userError || !user) return;
 
       const { data, error } = await supabase
         .from('users')
@@ -30,54 +32,55 @@ export default function ProfileForm() {
       }
     };
 
-    checkExisting();
+    fetchProfile();
   }, []);
 
-  const handleSave = async () => {
+  const handleSaveProfile = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
     if (!user) return;
 
-    if (alreadyExists) {
-      Alert.alert('Error', 'Profile already exists.');
-      return;
+    let profileError = null;
+
+    if (!alreadyExists) {
+      const { error } = await supabase.from('users').insert({
+        id: user.id,
+        full_name: fullName,
+        phone_number: phone,
+        email: user.email,
+      });
+      profileError = error;
+    } else {
+      const { error } = await supabase
+        .from('users')
+        .update({ full_name: fullName, phone_number: phone })
+        .eq('id', user.id);
+      profileError = error;
     }
 
-    const { error } = await supabase.from('users').insert({
-      id: user.id,
-      full_name: fullName,
-      phone_number: phone,
-      email: user.email,
-    });
-
-    if (error) {
-      Alert.alert('Error', error.message);
+    if (profileError) {
+      Alert.alert('Error', profileError.message);
     } else {
-      Alert.alert('✅ Success', 'Profile created successfully!');
-      router.replace('/(tabs)/');
+      Alert.alert('✅ Success', 'Profile updated successfully!');
+      setFullName('');
+      setPhone('');
     }
   };
 
   const handleChangePassword = async () => {
-    Alert.prompt(
-      'Change Password',
-      'Enter new password:',
-      async (newPassword) => {
-        if (!newPassword || newPassword.length < 6) {
-          Alert.alert('Error', 'Password must be at least 6 characters.');
-          return;
-        }
+    if (newPassword.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters.');
+      return;
+    }
 
-        const { error } = await supabase.auth.updateUser({ password: newPassword });
-        if (error) {
-          Alert.alert('Error', error.message);
-        } else {
-          Alert.alert('✅ Password changed successfully');
-        }
-      }
-    );
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      Alert.alert('Error', error.message);
+    } else {
+      Alert.alert('✅ Success', 'Password changed successfully!');
+      setNewPassword('');
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -87,9 +90,16 @@ export default function ProfileForm() {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
-          const { error } = await supabase.rpc('delete_user'); // you must create this function
-          if (error) {
-            Alert.alert('Error', error.message);
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (!user) return;
+
+          const { error: dbError } = await supabase.from('users').delete().eq('id', user.id);
+          const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
+
+          if (dbError || authError) {
+            Alert.alert('Error', dbError?.message || authError?.message || 'Unknown error');
           } else {
             Alert.alert('Deleted', 'Your account has been deleted');
             router.replace('/(auth)/login');
@@ -119,18 +129,25 @@ export default function ProfileForm() {
         value={phone}
       />
 
-      {!alreadyExists && (
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>Save Profile</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity style={styles.button} onPress={handleSaveProfile}>
+        <Text style={styles.buttonText}>Save Profile</Text>
+      </TouchableOpacity>
+
+      <TextInput
+        style={styles.input}
+        placeholder="New Password (min 6 characters)"
+        placeholderTextColor="#999"
+        secureTextEntry
+        onChangeText={setNewPassword}
+        value={newPassword}
+      />
 
       <TouchableOpacity style={styles.secondary} onPress={handleChangePassword}>
-        <Text style={styles.linkText}>Change Password</Text>
+        <Text style={styles.buttonText}>Change Password</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.danger} onPress={handleDeleteAccount}>
-        <Text style={styles.linkText}>❌ Delete Account</Text>
+        <Text style={styles.buttonText}>❌ Delete Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -167,7 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#444',
     paddingVertical: 12,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   danger: {
     backgroundColor: '#aa3333',
@@ -178,9 +195,5 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontWeight: 'bold',
-  },
-  linkText: {
-    color: 'white',
-    textAlign: 'center',
   },
 });

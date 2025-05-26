@@ -1,6 +1,4 @@
 
-import { View } from 'react-native';
+// app/(auth)/register.tsx
 import RegisterForm from '../../components/(auth)/RegisterForm';
-export default function RegisterScreen() {
-  return <RegisterForm />;
-}
+export default RegisterForm;
