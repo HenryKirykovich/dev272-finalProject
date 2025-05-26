@@ -1,8 +1,14 @@
-// components/auth/RegisterForm.tsx
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import { supabase } from '../../lib/supabase';
+import { useState } from 'react';
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { useRouter } from 'expo-router';
+import { supabase } from '../../lib/supabase';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -10,33 +16,53 @@ export default function RegisterForm() {
   const router = useRouter();
 
   const handleRegister = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter email and password');
+      return;
+    }
+
     const { error } = await supabase.auth.signUp({ email, password });
-    if (error) Alert.alert('Registration Error', error.message);
-    else {
-      Alert.alert('Success', 'Check your email to confirm.');
-      router.replace('../(auth)/login'); // Redirect to login after registration
+
+    if (error) {
+      Alert.alert('Registration failed', error.message);
+    } else {
+      Alert.alert('Success', 'Please check your email to confirm your account.');
+      router.replace('/(auth)/profile-form');
+
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>📝 Register</Text>
+
       <TextInput
+        style={styles.input}
         placeholder="Email"
-        value={email}
+        placeholderTextColor="#999"
         onChangeText={setEmail}
-        autoCapitalize="none"
+        value={email}
         keyboardType="email-address"
-        style={styles.input}
+        autoCapitalize="none"
       />
       <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
         style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#999"
+        onChangeText={setPassword}
+        value={password}
+        secureTextEntry
       />
-      <Button title="Register" onPress={handleRegister} />
+
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>REGISTER</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+        <Text style={styles.linkText}>
+          Already have an account? <Text style={styles.linkHighlight}>Login</Text>
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -44,20 +70,43 @@ export default function RegisterForm() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#2c2c2c',
     justifyContent: 'center',
-    padding: 20,
+    padding: 24,
   },
   title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
+    fontSize: 28,
+    color: 'white',
+    marginBottom: 30,
+    alignSelf: 'center',
   },
   input: {
     height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    backgroundColor: '#3d3d3d',
+    color: 'white',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    marginBottom: 16,
+  },
+  button: {
+    backgroundColor: '#28a745',
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  linkText: {
+    color: '#ccc',
+    textAlign: 'center',
+    fontSize: 14,
+  },
+  linkHighlight: {
+    color: '#00bfff',
+    fontWeight: 'bold',
   },
 });
