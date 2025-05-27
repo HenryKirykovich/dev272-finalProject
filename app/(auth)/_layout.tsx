@@ -13,7 +13,7 @@ export default function AuthLayout() {
         name="login"
         options={{
           title: 'Login',
-          headerLeft: () => null, // ❌ убираем стрелку
+          headerLeft: () => null, // killed the back button
         }}
       />
       <Stack.Screen
@@ -27,7 +27,7 @@ export default function AuthLayout() {
         name="profile-form"
         options={{
           title: 'My Profile',
-          // ✅ стрелка назад остаётся по умолчанию
+          // still no back button
         }}
       />
     </Stack>
