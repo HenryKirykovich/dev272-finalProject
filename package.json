@@ -1,5 +1,6 @@
 {
   "name": "dev272-finalproject",
+  "description": "This application is designed to monitor your mood throughout the day, offering features such as journaling and a to-do list.",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
