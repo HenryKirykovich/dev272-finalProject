@@ -1,50 +1,170 @@
-# Welcome to your Expo app 👋
+# dev272-finalproject
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native application designed to monitor your mood throughout the day, offering features such as journaling and a to-do list.
 
-## Get started
+## 📱 About
 
-1. Install dependencies
+This mood monitoring app helps users track their emotional well-being through:
+- **Mood Tracking**: Monitor your mood throughout the day
+- **Journaling**: Reflect on your thoughts and experiences
+- **To-Do List**: Organize your daily tasks and goals
 
+Built with React Native and Expo for cross-platform compatibility (iOS, Android, and Web).
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+- [Node.js](https://nodejs.org/) (version 18 or higher)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/karilaa-dev/dev272-finalProject.git
+   cd dev272-finalProject
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. **Start the development server**
    ```bash
-   npx expo start
+   npm start
    ```
 
-In the output, you'll find options to open the app in a
+### Running the App
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+After starting the development server, you can run the app on different platforms:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **iOS Simulator**: Press `i` in the terminal or run `npm run ios`
+- **Android Emulator**: Press `a` in the terminal or run `npm run android`
+- **Web Browser**: Press `w` in the terminal or run `npm run web`
+- **Physical Device**: Scan the QR code with the Expo Go app
 
-## Get a fresh project
+## 🧰 Tech Stack
 
-When you're ready, run:
+- **Framework**: [Expo](https://expo.dev/) with [React Native](https://reactnative.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Navigation**: [Expo Router](https://docs.expo.dev/router/introduction/)
+- **Styling**: React Native StyleSheet
+- **Code Quality**: ESLint + Prettier
+- **Development**: VS Code with recommended extensions
+
+## 📱 Features
+
+### Current Features
+- Cross-platform compatibility (iOS, Android, Web)
+- Modern navigation with Expo Router
+- TypeScript for type safety
+- Consistent code formatting with Prettier
+- Code quality enforcement with ESLint
+
+### Planned Features
+- Mood tracking interface
+- Daily journaling functionality
+- To-do list management
+- Data persistence
+- Mood analytics (mood trends, etc.)
+
+## 🛠️ Development
+
+### Code Quality
+
+This project uses ESLint and Prettier for code quality and formatting:
 
 ```bash
-npm run reset-project
+# Run linting
+npm run lint
+
+# Fix linting issues automatically
+npm run lint:fix
+
+# Format code with Prettier
+npm run format
+
+# Check code formatting
+npm run format:check
+
+# Run TypeScript type checking
+npm run type-check
+
+# Run all checks (recommended before committing)
+npm run check-all
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### VS Code Setup
 
-## Learn more
+For the best development experience with VS Code:
 
-To learn more about developing your project with Expo, look at the following resources:
+1. Install the recommended extensions (you'll be prompted when opening the project)
+2. Code will auto-format on save
+3. ESLint errors will be highlighted in real-time
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## 🔧 Available Scripts
 
-## Join the community
+- `npm start` - Start the Expo development server
+- `npm run android` - Run on Android emulator/device
+- `npm run ios` - Run on iOS simulator/device
+- `npm run web` - Run in web browser
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint issues automatically
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check if code is formatted correctly
+- `npm run type-check` - Run TypeScript type checking
+- `npm run check-all` - Run all quality checks
 
-Join our community of developers creating universal apps.
+## 🤝 Contributing
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run quality checks (`npm run check-all`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+### Code Style
+
+This project follows strict code formatting and linting rules:
+- Always run `npm run check-all` before committing
+- Use meaningful commit messages
+- Follow TypeScript best practices
+- Write self-documenting code
+
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**Metro bundler issues**
+```bash
+npx expo start --clear
+```
+
+**Node modules issues**
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**TypeScript errors**
+```bash
+npm run type-check
+```
+
+**Linting/formatting issues**
+```bash
+npm run lint:fix
+npm run format
+```
+
+### Getting Help
+
+- Check the [Expo Documentation](https://docs.expo.dev/)
+- Review [React Native Documentation](https://reactnative.dev/docs/getting-started)
