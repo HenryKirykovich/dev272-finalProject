@@ -1,4 +1,4 @@
-# dev272-finalproject
+# WellMind
 
 A React Native application designed to monitor your mood throughout the day, offering features such as journaling and a to-do list.
 

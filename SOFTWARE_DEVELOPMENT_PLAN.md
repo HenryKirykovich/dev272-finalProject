@@ -2,7 +2,7 @@
 
 ## 📋 Project Overview
 
-**Project Name:** dev272-finalproject  
+**Project Name:** WellMinds 
 **Project Type:** Mood Monitoring Mobile Application  
 **Platform:** Cross-platform (iOS, Android, Web)
 
