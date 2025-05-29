@@ -142,13 +142,13 @@ Our app addresses this gap by providing an integrated platform for mood tracking
 **Goal:** Project and communications settup
 
 ### Week 2: First Working Prototype
-**Goal:** Basic app structure and core functionality
+**Goal:** Basic app structure and some functionality
 
-### Week 3: UI and Most Features Done
-**Goal:** Complete UI design and implement major features
+### Week 3: Development continues
+**Goal:** More features, closer to MVP
 
-### Week 4: MVP
-**Goal:** Minimum Viable Product completion
+### Week 4: MVP + Features
+**Goal:** Minimum Viable Product completion, and more features
 
 ### Week 5: Testing and Polishing
 **Goal:** Quality assurance and final refinements
