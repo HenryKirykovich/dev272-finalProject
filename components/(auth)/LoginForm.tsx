@@ -95,7 +95,8 @@ export default function LoginForm() {
 
             <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
               <Text style={styles.link}>
-                Don’t have an account? <Text style={styles.linkBold}>Register</Text>
+                Don’t have an account?{' '}
+                <Text style={styles.linkBold}>Register</Text>
               </Text>
             </TouchableOpacity>
           </View>
