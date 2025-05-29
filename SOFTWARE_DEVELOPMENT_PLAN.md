@@ -14,7 +14,7 @@
 |------|-------------|----------------|------------------|
 | **Henadzi Kirykovich** | Backend Developer | Frontend Developer | Database design, API development, server logic, React Native components |
 | **Kyryl Andreiev** | Project Manager | DevOps | Sprint planning, team coordination, CI/CD setup, deployment |
-| **Shayla Rohrer** | UI/UX Designer | - | User interface design, user experience research, prototyping, design systems |
+| **Shayla Rohrer** | UI/UX Designer | Frontend Developer | User interface design, user experience research, prototyping, design systems, React Native components |
 | **Tri Nguyen** | QA Engineer | Frontend Developer | Testing strategy, quality assurance, bug tracking, React Native development |
 
 ---
