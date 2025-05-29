@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "dev272-finalProject",
-    "slug": "dev272-finalProject",
+    "name": "WellMind",
+    "slug": "WellMind",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "dev272finalproject",
+    "scheme": "wellmind",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

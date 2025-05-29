@@ -2,7 +2,7 @@
 
 ## 📋 Project Overview
 
-**Project Name:** WellMinds 
+**Project Name:** WellMind
 **Project Type:** Mood Monitoring Mobile Application  
 **Platform:** Cross-platform (iOS, Android, Web)
 
