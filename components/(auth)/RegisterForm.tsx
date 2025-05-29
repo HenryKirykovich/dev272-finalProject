@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import { supabase } from '../../lib/supabase';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { supabase } from '../../lib/supabase';
 
 // Регулярное выражение для проверки email
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -9,12 +9,11 @@ const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState(''); // Для хранения ошибки email
-  const [passwordError, setPasswordError] = useState(''); // Для хранения ошибки пароля
-  const [isPasswordValid, setIsPasswordValid] = useState(true); // Флаг для пароля
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
   const router = useRouter();
 
-  // Функция для проверки email
   const validateEmail = (email: string) => {
     if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address (e.g., user@example.com)');
@@ -24,7 +23,6 @@ export default function RegisterForm() {
     return true;
   };
 
-  // Функция для проверки пароля
   const validatePassword = (password: string) => {
     if (password.length < 6) {
       setIsPasswordValid(false);
@@ -37,51 +35,68 @@ export default function RegisterForm() {
   };
 
   const handleRegister = async () => {
-    // Проверка email и пароля перед отправкой
     if (!validateEmail(email) || !validatePassword(password)) return;
 
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) {
-      setPasswordError(error.message); // Если ошибка при регистрации, показываем
+      setPasswordError(error.message);
     } else {
       Alert.alert('Success', 'Check your email to confirm.');
-      router.replace('/(tabs)/placeholder');
+      router.replace('/(tabs)');
     }
   };
 
   return (
-    <View style={styles.container}>
-      {/* Email Input */}
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => {
-          setEmail(text);
-          validateEmail(text); // Проверяем email каждый раз при изменении
-        }}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        style={styles.input}
-      />
-      {/* Email Error */}
-      {emailError && <Text style={styles.errorText}>{emailError}</Text>}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={80}
+    >
+      <ImageBackground
+        source={require('../../assets/images/velvet.jpg')}
+        style={{ flex: 1 }}
+        resizeMode="cover"
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} keyboardShouldPersistTaps="handled">
+          <View style={styles.container}>
+            <Text style={styles.title}>WellMind</Text>
+            <Text style={styles.subtitle}>mental health</Text>
+            <Text style={styles.subtitle}>journal</Text>
 
-      {/* Password Input */}
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={(text) => {
-          setPassword(text);
-          validatePassword(text); // Проверяем пароль каждый раз при изменении
-        }}
-        secureTextEntry
-        style={styles.input}
-      />
-      {/* Password Error */}
-      {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                validateEmail(text);
+              }}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              style={styles.input}
+              placeholderTextColor="#000"
+            />
+            {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
-      <Button title="Register" onPress={handleRegister} />
-    </View>
+            <TextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                validatePassword(text);
+              }}
+              secureTextEntry
+              style={styles.input}
+              placeholderTextColor="#000"
+            />
+            {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
+
+            <TouchableOpacity style={styles.button} onPress={handleRegister}>
+              <Text style={styles.buttonText}>Register</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </ImageBackground>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -89,19 +104,52 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: 24,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 18,
+    margin: 16,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#c9a6c4',
+    textAlign: 'center',
+    marginBottom: 2,
+    marginTop: 16,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#a18fa4',
+    textAlign: 'center',
+    marginBottom: 2,
   },
   input: {
-    height: 50,
-    borderColor: '#ccc',
+    height: 48,
+    backgroundColor: '#c9a6c4',
+    color: '#fff',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    marginBottom: 14,
     borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    borderColor: '#e0d6e2',
+    fontWeight: 'bold',
+  },
+  button: {
+    backgroundColor: '#6a66a3',
+    paddingVertical: 14,
+    borderRadius: 18,
+    marginBottom: 20,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 18,
   },
   errorText: {
     color: 'red',
-    marginTop: 10,
+    marginBottom: 8,
     textAlign: 'center',
   },
 });

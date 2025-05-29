@@ -1,7 +1,7 @@
 // app/(auth)/profile-form.tsx
-import { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../../lib/supabase';
 
 export default function ProfileForm() {
@@ -36,6 +36,11 @@ export default function ProfileForm() {
   }, []);
 
   const handleSaveProfile = async () => {
+    if (!fullName.trim() || !phone.trim()) {
+      Alert.alert('Error', 'Full Name and Phone Number cannot be empty.');
+      return;
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -63,6 +68,7 @@ export default function ProfileForm() {
       Alert.alert('Error', profileError.message);
     } else {
       Alert.alert('✅ Success', 'Profile updated successfully!');
+      console.log('Profile updated:', { fullName, phone }); // <-- Success log
       setFullName('');
       setPhone('');
     }
@@ -74,9 +80,11 @@ export default function ProfileForm() {
       return;
     }
 
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      Alert.alert('Error', error.message);
+    const response = await supabase.auth.updateUser({ password: newPassword });
+    console.log('Password change response:', response); // Логируем весь ответ
+
+    if (response.error) {
+      Alert.alert('Error', response.error.message);
     } else {
       Alert.alert('✅ Success', 'Password changed successfully!');
       setNewPassword('');
@@ -110,90 +118,139 @@ export default function ProfileForm() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>👤 Your Profile</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={80}
+    >
+      <ImageBackground
+        source={require('../../assets/images/velvet.jpg')}
+        style={{ flex: 1 }}
+        resizeMode="cover"
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} keyboardShouldPersistTaps="handled">
+          <View style={styles.container}>
+            <Text style={styles.title}>WellMind</Text>
+            <Text style={styles.subtitle}>mental health</Text>
+            <Text style={styles.subtitle}>journal</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Full Name"
-        placeholderTextColor="#999"
-        onChangeText={setFullName}
-        value={fullName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Phone Number"
-        placeholderTextColor="#999"
-        keyboardType="phone-pad"
-        onChangeText={setPhone}
-        value={phone}
-      />
+            <TextInput
+              style={styles.input}
+              placeholder="Full Name"
+              placeholderTextColor="#999"
+              onChangeText={setFullName}
+              value={fullName}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              placeholderTextColor="#999"
+              keyboardType="phone-pad"
+              onChangeText={setPhone}
+              value={phone}
+            />
 
-      <TouchableOpacity style={styles.button} onPress={handleSaveProfile}>
-        <Text style={styles.buttonText}>Save Profile</Text>
-      </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleSaveProfile}>
+              <Text style={styles.buttonText}>Save Profile</Text>
+            </TouchableOpacity>
 
-      <TextInput
-        style={styles.input}
-        placeholder="New Password (min 6 characters)"
-        placeholderTextColor="#999"
-        secureTextEntry
-        onChangeText={setNewPassword}
-        value={newPassword}
-      />
+            <TextInput
+              style={styles.input}
+              placeholder="New Password (min 6 characters)"
+              placeholderTextColor="#999"
+              secureTextEntry
+              onChangeText={setNewPassword}
+              value={newPassword}
+            />
 
-      <TouchableOpacity style={styles.secondary} onPress={handleChangePassword}>
-        <Text style={styles.buttonText}>Change Password</Text>
-      </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
+              <Text style={styles.buttonText}>Change Password</Text>
+            </TouchableOpacity>
 
-      <TouchableOpacity style={styles.danger} onPress={handleDeleteAccount}>
-        <Text style={styles.buttonText}>❌ Delete Account</Text>
-      </TouchableOpacity>
-    </View>
+            <TouchableOpacity style={styles.danger} onPress={handleDeleteAccount}>
+              <Text style={styles.buttonText}>❌ Delete Account</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.secondary, { backgroundColor: '#888' }]}
+              onPress={() => {
+                setFullName('');
+                setPhone('');
+                setNewPassword('');
+              }}
+            >
+              <Text style={styles.buttonText}>Clear Fields</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: '#28a745' }]}
+              onPress={() => router.replace('/(tabs)')}
+            >
+              <Text style={styles.buttonText}>Home Page</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </ImageBackground>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2c2c2c',
     justifyContent: 'center',
     padding: 24,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 18,
+    margin: 16,
   },
   title: {
-    fontSize: 24,
-    color: 'white',
-    marginBottom: 20,
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#c9a6c4',
     textAlign: 'center',
+    marginBottom: 2,
+    marginTop: 16,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#a18fa4',
+    textAlign: 'center',
+    marginBottom: 2,
   },
   input: {
     height: 48,
-    backgroundColor: '#3d3d3d',
-    color: 'white',
-    borderRadius: 10,
+    backgroundColor: '#fff',
+    color: '#333',
+    borderRadius: 16,
     paddingHorizontal: 14,
     marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#e0d6e2',
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#c9a6c4',
     paddingVertical: 14,
-    borderRadius: 10,
+    borderRadius: 18,
     marginBottom: 20,
+    marginTop: 10,
   },
   secondary: {
     backgroundColor: '#444',
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 16,
     marginBottom: 20,
   },
   danger: {
     backgroundColor: '#aa3333',
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 16,
+    marginBottom: 20,
   },
   buttonText: {
-    color: 'white',
+    color: '#fff',
     textAlign: 'center',
     fontWeight: 'bold',
+    fontSize: 18,
   },
 });

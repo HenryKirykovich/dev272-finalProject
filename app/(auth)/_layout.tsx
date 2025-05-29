@@ -20,14 +20,14 @@ export default function AuthLayout() {
         name="register"
         options={{
           title: 'Register',
-          
+          headerLeft: () => null, // убирает стрелку назад
         }}
       />
       <Stack.Screen
         name="profile-form"
         options={{
           title: 'My Profile',
-          // still no back button
+          headerLeft: undefined, // стрелка назад появится, если есть куда возвращаться
         }}
       />
     </Stack>
