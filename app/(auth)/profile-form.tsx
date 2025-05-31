@@ -171,16 +171,16 @@ export default function ProfileForm() {
               <Text style={styles.buttonText}>❌ Delete Account</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.secondary, { backgroundColor: '#888' }]}
-              onPress={() => {
-                setFullName('');
-                setPhone('');
-                setNewPassword('');
-              }}
-            >
-              <Text style={styles.buttonText}>Clear Fields</Text>
-            </TouchableOpacity>
+            {/* <TouchableOpacity */}
+              {/* style={[styles.secondary, { backgroundColor: '#888' }]} */}
+              {/* onPress={() => { */}
+                {/* setFullName(''); */}
+                {/* setPhone(''); */}
+                {/* setNewPassword(''); */}
+              {/* }} */}
+            {/* > */}
+              {/* <Text style={styles.buttonText}>Clear Fields</Text> */}
+            {/* </TouchableOpacity> */}
 
             <TouchableOpacity
               style={[styles.button, { backgroundColor: '#28a745' }]}

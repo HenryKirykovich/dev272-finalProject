@@ -1,6 +1,16 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { supabase } from '../../lib/supabase';
 
 // Регулярное выражение для проверки email
@@ -56,11 +66,24 @@ export default function LoginForm() {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.container}>
-            <Text style={styles.title}>WellMind</Text>
-            <Text style={styles.subtitle}>mental health</Text>
-            <Text style={styles.subtitle}>journal</Text>
+            <View style={styles.textBgWrapper}>
+              <ImageBackground
+                source={require('../../assets/images/velvet3.png')}
+                style={StyleSheet.absoluteFillObject}
+                imageStyle={{ opacity: 0.5, borderRadius: 16 }}
+                resizeMode="cover"
+              />
+              <View style={styles.textBgContent}>
+                <Text style={[styles.title, { color: '#000' }]}>WellMind</Text>
+                <Text style={[styles.subtitle, { color: '#000' }]}>mental health</Text>
+                <Text style={[styles.subtitle, { color: '#000' }]}>journal</Text>
+              </View>
+            </View>
 
             <TextInput
               placeholder="Email"
@@ -166,5 +189,20 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 8,
     textAlign: 'center',
+  },
+  textBgWrapper: {
+    position: 'relative',
+    marginBottom: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    minHeight: 200, // или подбери нужную высоту
+    justifyContent: 'center',
+  },
+  textBgContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
+    zIndex: 1,
   },
 });
