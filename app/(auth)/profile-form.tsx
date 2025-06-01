@@ -184,7 +184,7 @@ export default function ProfileForm() {
 
             <TouchableOpacity
               style={[styles.button, { backgroundColor: '#28a745' }]}
-              onPress={() => router.replace('/(tabs)')}
+              onPress={() => router.replace('/(main)/wellmind')}
             >
               <Text style={styles.buttonText}>Home Page</Text>
             </TouchableOpacity>

@@ -11,24 +11,15 @@ export default function AuthLayout() {
     >
       <Stack.Screen
         name="login"
-        options={{
-          title: 'Login',
-          headerLeft: () => null, // killed the back button
-        }}
+        options={{ title: 'Login', headerLeft: () => null }}
       />
       <Stack.Screen
         name="register"
-        options={{
-          title: 'Register',
-          headerLeft: () => null, // убирает стрелку назад
-        }}
+        options={{ title: 'Register', headerLeft: () => null }}
       />
       <Stack.Screen
         name="profile-form"
-        options={{
-          title: 'My Profile',
-          headerLeft: undefined, // стрелка назад появится, если есть куда возвращаться
-        }}
+        options={{ title: 'My Profile' }}
       />
     </Stack>
   );

@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
 
-// Регулярное выражение для проверки email
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export default function RegisterForm() {
@@ -22,12 +21,11 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [isPasswordValid, setIsPasswordValid] = useState(true);
   const router = useRouter();
 
   const validateEmail = (email: string) => {
     if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address (e.g., user@example.com)');
+      setEmailError('Please enter a valid email address');
       return false;
     }
     setEmailError('');
@@ -36,11 +34,9 @@ export default function RegisterForm() {
 
   const validatePassword = (password: string) => {
     if (password.length < 6) {
-      setIsPasswordValid(false);
       setPasswordError('Password must be at least 6 characters long');
       return false;
     }
-    setIsPasswordValid(true);
     setPasswordError('');
     return true;
   };
@@ -53,14 +49,14 @@ export default function RegisterForm() {
       setPasswordError(error.message);
     } else {
       Alert.alert('Success', 'Check your email to confirm.');
-      router.replace('/(tabs)');
+      router.replace('/(main)/wellmind');
     }
   };
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={80}
     >
       <ImageBackground
@@ -73,19 +69,7 @@ export default function RegisterForm() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.container}>
-            <View style={styles.textBgWrapper}>
-              <ImageBackground
-                source={require('../../assets/images/velvet3.png')}
-                style={StyleSheet.absoluteFillObject}
-                imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode="cover"
-              />
-              <View style={styles.textBgContent}>
-                <Text style={[styles.title, { color: '#000' }]}>WellMind</Text>
-                <Text style={[styles.subtitle, { color: '#000' }]}>mental health</Text>
-                <Text style={[styles.subtitle, { color: '#000' }]}>journal</Text>
-              </View>
-            </View>
+            <Text style={styles.title}>Create Your Account</Text>
 
             <TextInput
               placeholder="Email"
@@ -126,44 +110,31 @@ export default function RegisterForm() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    margin: 24,
     padding: 24,
-    backgroundColor: 'rgba(255,255,255,0.7)',
     borderRadius: 18,
-    margin: 16,
   },
   title: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#000',
     textAlign: 'center',
-    marginBottom: 2,
-    marginTop: 16,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#000',
-    textAlign: 'center',
-    marginBottom: 2,
+    marginBottom: 24,
   },
   input: {
+    backgroundColor: '#e8e6f2',
     height: 48,
-    backgroundColor: '#c9a6c4',
-    color: '#fff',
-    borderRadius: 16,
+    borderRadius: 12,
     paddingHorizontal: 14,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#e0d6e2',
-    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#000',
   },
   button: {
     backgroundColor: '#6a66a3',
+    borderRadius: 16,
     paddingVertical: 14,
-    borderRadius: 18,
-    marginBottom: 20,
     marginTop: 10,
+    marginBottom: 18,
   },
   buttonText: {
     color: '#fff',
@@ -175,20 +146,5 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 8,
     textAlign: 'center',
-  },
-  textBgWrapper: {
-    position: 'relative',
-    marginBottom: 24,
-    borderRadius: 16,
-    overflow: 'hidden',
-    minHeight: 200,
-    justifyContent: 'center',
-  },
-  textBgContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    zIndex: 1,
   },
 });

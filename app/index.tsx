@@ -1,37 +1,18 @@
 // app/index.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Redirect } from 'expo-router';
 import { supabase } from '../lib/supabase';
 
 export default function Index() {
-  const router = useRouter();
-  const [checking, setChecking] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (session) {
-        router.replace('/(tabs)'); // 🔁 если авторизован — на главную часть
-      } else {
-        router.replace('/(auth)/login'); // 🔐 иначе — на логин
-      }
-
-      setChecking(false);
-    };
-
-    checkSession();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user);
+    });
   }, []);
 
-  if (checking) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-        <Text style={{ marginTop: 10 }}>Checking session...</Text>
-      </View>
-    );
-  }
+  if (isLoggedIn === null) return null;
 
-  return null;
+  return <Redirect href={isLoggedIn ? '/(main)/wellmind' : '/(auth)/login'} />;
 }

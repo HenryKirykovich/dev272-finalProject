@@ -23,6 +23,10 @@
       "output": "static",
       "favicon": "./assets/images/velvet3.png"
     },
+    
+    "router": {
+      "devTools": false   
+    },
     "plugins": [
       "expo-router",
       [

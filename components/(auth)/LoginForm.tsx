@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
 
-// Регулярное выражение для проверки email
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export default function LoginForm() {
@@ -26,7 +25,7 @@ export default function LoginForm() {
 
   const validateEmail = (email: string) => {
     if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address (e.g., user@example.com)');
+      setEmailError('Please enter a valid email address');
       return false;
     }
     setEmailError('');
@@ -51,14 +50,14 @@ export default function LoginForm() {
     if (error) {
       setPasswordError(error.message);
     } else {
-      router.replace('/(tabs)');
+      router.replace('/(main)/wellmind');
     }
   };
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={80}
     >
       <ImageBackground
@@ -71,19 +70,7 @@ export default function LoginForm() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.container}>
-            <View style={styles.textBgWrapper}>
-              <ImageBackground
-                source={require('../../assets/images/velvet3.png')}
-                style={StyleSheet.absoluteFillObject}
-                imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode="cover"
-              />
-              <View style={styles.textBgContent}>
-                <Text style={[styles.title, { color: '#000' }]}>WellMind</Text>
-                <Text style={[styles.subtitle, { color: '#000' }]}>mental health</Text>
-                <Text style={[styles.subtitle, { color: '#000' }]}>journal</Text>
-              </View>
-            </View>
+            <Text style={styles.title}>Login to WellMind</Text>
 
             <TextInput
               placeholder="Email"
@@ -112,15 +99,12 @@ export default function LoginForm() {
             />
             {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-              <Text style={styles.link}>
-                Don’t have an account?{' '}
-                <Text style={styles.linkBold}>Register</Text>
-              </Text>
+              <Text style={styles.link}>Don't have an account? <Text style={styles.linkBold}>Register</Text></Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -131,44 +115,31 @@ export default function LoginForm() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    margin: 24,
     padding: 24,
-    backgroundColor: 'rgba(255,255,255,0.7)',
     borderRadius: 18,
-    margin: 16,
   },
   title: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#c9a6c4',
     textAlign: 'center',
-    marginBottom: 2,
-    marginTop: 16,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#a18fa4',
-    textAlign: 'center',
-    marginBottom: 2,
+    marginBottom: 24,
   },
   input: {
+    backgroundColor: '#e8e6f2',
     height: 48,
-    backgroundColor: '#c9a6c4',
-    color: '#fff',
-    borderRadius: 16,
+    borderRadius: 12,
     paddingHorizontal: 14,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#e0d6e2',
-    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#000',
   },
-  loginButton: {
+  button: {
     backgroundColor: '#6a66a3',
+    borderRadius: 16,
     paddingVertical: 14,
-    borderRadius: 18,
-    marginBottom: 20,
     marginTop: 10,
+    marginBottom: 18,
   },
   buttonText: {
     color: '#fff',
@@ -177,9 +148,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   link: {
-    marginTop: 12,
-    color: '#000',
     textAlign: 'center',
+    color: '#000',
   },
   linkBold: {
     fontWeight: 'bold',
@@ -189,20 +159,5 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 8,
     textAlign: 'center',
-  },
-  textBgWrapper: {
-    position: 'relative',
-    marginBottom: 24,
-    borderRadius: 16,
-    overflow: 'hidden',
-    minHeight: 200, // или подбери нужную высоту
-    justifyContent: 'center',
-  },
-  textBgContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    zIndex: 1,
   },
 });
