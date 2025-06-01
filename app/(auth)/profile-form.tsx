@@ -1,7 +1,17 @@
-// app/(auth)/profile-form.tsx
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { supabase } from '../../lib/supabase';
 
 export default function ProfileForm() {
@@ -68,7 +78,6 @@ export default function ProfileForm() {
       Alert.alert('Error', profileError.message);
     } else {
       Alert.alert('✅ Success', 'Profile updated successfully!');
-      console.log('Profile updated:', { fullName, phone }); // <-- Success log
       setFullName('');
       setPhone('');
     }
@@ -81,7 +90,6 @@ export default function ProfileForm() {
     }
 
     const response = await supabase.auth.updateUser({ password: newPassword });
-    console.log('Password change response:', response); // Логируем весь ответ
 
     if (response.error) {
       Alert.alert('Error', response.error.message);
@@ -128,11 +136,24 @@ export default function ProfileForm() {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.container}>
-            <Text style={styles.title}>WellMind</Text>
-            <Text style={styles.subtitle}>mental health</Text>
-            <Text style={styles.subtitle}>journal</Text>
+            <View style={styles.textBgWrapper}>
+              <ImageBackground
+                source={require('../../assets/images/velvet3.png')}
+                style={StyleSheet.absoluteFillObject}
+                imageStyle={{ opacity: 0.5, borderRadius: 16 }}
+                resizeMode="cover"
+              />
+              <View style={styles.textBgContent}>
+                <Text style={[styles.title, { color: '#000' }]}>WellMind</Text>
+                <Text style={[styles.subtitle, { color: '#000' }]}>mental health</Text>
+                <Text style={[styles.subtitle, { color: '#000' }]}>journal</Text>
+              </View>
+            </View>
 
             <TextInput
               style={styles.input}
@@ -171,19 +192,8 @@ export default function ProfileForm() {
               <Text style={styles.buttonText}>❌ Delete Account</Text>
             </TouchableOpacity>
 
-            {/* <TouchableOpacity */}
-              {/* style={[styles.secondary, { backgroundColor: '#888' }]} */}
-              {/* onPress={() => { */}
-                {/* setFullName(''); */}
-                {/* setPhone(''); */}
-                {/* setNewPassword(''); */}
-              {/* }} */}
-            {/* > */}
-              {/* <Text style={styles.buttonText}>Clear Fields</Text> */}
-            {/* </TouchableOpacity> */}
-
             <TouchableOpacity
-              style={[styles.button, { backgroundColor: '#28a745' }]}
+              style={[styles.button, { backgroundColor: '#6a66a3' }]}
               onPress={() => router.replace('/(main)/wellmind')}
             >
               <Text style={styles.buttonText}>Home Page</Text>
@@ -204,17 +214,32 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     margin: 16,
   },
+  textBgWrapper: {
+    position: 'relative',
+    marginBottom: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    minHeight: 200,
+    justifyContent: 'center',
+    width: '100%',
+  },
+  textBgContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
+    zIndex: 1,
+  },
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#c9a6c4',
+    color: '#000',
     textAlign: 'center',
     marginBottom: 2,
     marginTop: 16,
   },
   subtitle: {
     fontSize: 18,
-    color: '#a18fa4',
+    color: '#000',
     textAlign: 'center',
     marginBottom: 2,
   },
@@ -229,17 +254,11 @@ const styles = StyleSheet.create({
     borderColor: '#e0d6e2',
   },
   button: {
-    backgroundColor: '#c9a6c4',
+    backgroundColor: '#6a66a3',
     paddingVertical: 14,
     borderRadius: 18,
     marginBottom: 20,
     marginTop: 10,
-  },
-  secondary: {
-    backgroundColor: '#444',
-    paddingVertical: 12,
-    borderRadius: 16,
-    marginBottom: 20,
   },
   danger: {
     backgroundColor: '#aa3333',

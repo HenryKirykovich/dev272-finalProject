@@ -14,11 +14,11 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="moods"
+        name="goals" // Переименованная папка
         options={{
-          title: 'Moods',
+          title: 'Goals',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="happy-outline" size={size} color={color} />
+            <Ionicons name="checkmark-done-outline" size={size} color={color} />
           ),
         }}
       />

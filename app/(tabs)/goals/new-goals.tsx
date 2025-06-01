@@ -14,8 +14,8 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
 
-export default function NewEntryScreen() {
-  const [text, setText] = useState('');
+export default function NewGoalScreen() {
+  const [goal, setGoal] = useState('');
   const router = useRouter();
 
   const handleSave = async () => {
@@ -27,13 +27,13 @@ export default function NewEntryScreen() {
     }
 
     const { error } = await supabase
-      .from('journal_entries')
-      .insert({ content: text, user_id: user.id });
+      .from('daily_goals')
+      .insert({ title: goal, user_id: user.id });
 
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      router.push('/(tabs)/journal');
+      router.push('/(tabs)/goals');
     }
   };
 
@@ -41,7 +41,7 @@ export default function NewEntryScreen() {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}  //adjecting GAP between keyboard and typing text
+      keyboardVerticalOffset={0}
     >
       <ImageBackground
         source={require('../../../assets/images/velvet.jpg')}
@@ -56,16 +56,16 @@ export default function NewEntryScreen() {
           >
             <View style={styles.textBgWrapper}>
               <View style={styles.textBgContent}>
-                <Text style={styles.title}>New Entry</Text>
-                <Text style={styles.subtitle}>Write your thoughts below</Text>
+                <Text style={styles.title}>New Goal</Text>
+                <Text style={styles.subtitle}>Describe your goal for today</Text>
               </View>
             </View>
 
             <View style={styles.inputBox}>
               <TextInput
-                value={text}
-                onChangeText={setText}
-                placeholder="Type here..."
+                value={goal}
+                onChangeText={setGoal}
+                placeholder="Type your goal..."
                 placeholderTextColor="#fff"
                 style={styles.input}
                 multiline
