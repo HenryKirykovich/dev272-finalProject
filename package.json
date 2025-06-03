@@ -1,5 +1,6 @@
 {
-  "name": "dev272-finalproject",
+  "name": "wellmind",
+  "description": "This application is designed to monitor your mood throughout the day, offering features such as journaling and a to-do list.",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -8,7 +9,12 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "lint:fix": "expo lint --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json}\"",
+    "type-check": "tsc --noEmit",
+    "check-all": "npm run type-check && npm run lint && npm run format:check"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -45,8 +51,13 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.33.0",
+    "@typescript-eslint/parser": "^8.33.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "prettier": "^3.5.3",
     "typescript": "~5.8.3"
   },
   "private": true

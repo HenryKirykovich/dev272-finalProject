@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/velvet3.png",
-    "scheme": "dev272finalproject",
+    "scheme": "wellmind",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -23,9 +23,8 @@
       "output": "static",
       "favicon": "./assets/images/velvet3.png"
     },
-    
     "router": {
-      "devTools": false   
+      "devTools": false 
     },
     "plugins": [
       "expo-router",
