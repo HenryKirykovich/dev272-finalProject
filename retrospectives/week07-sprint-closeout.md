@@ -1,23 +1,33 @@
+# Week 6 Sprint Closeout
 ## Completed tasks
-This week we created first version of out WellMind app, with basic functionality.
+This week foundation for future development was created. We decided to use Discord as our messaging app. Also, First app designs for flow and interface was created.
 ### Tasks:
-| Task Name                                                                                                         | Creator | Assignee |
-| ----------------------------------------------------------------------------------------------------------------- | ------- | -------- |
-| [Navigation & State assignment](https://github.com/karilaa-dev/dev272-finalProject/issues/18)                     | Kyryl   | Henry    |
-| [Week 7 Sprint Retrospective & Sprint Closeout](https://github.com/karilaa-dev/dev272-finalProject/issues/20)     | Kyryl   | Kyryl    |
-| [Create registration page](https://github.com/karilaa-dev/dev272-finalProject/issues/19)                          | Kyryl   | Henry    |
-| [Add .env file with Supabase configuration variables](https://github.com/karilaa-dev/dev272-finalProject/pull/24) | Kyryl   | Kyryl    |
-| [Develop weekly retrospective flow](https://github.com/karilaa-dev/dev272-finalProject/issues/17)                 | Kyryl   | Kyryl    |
+| Task Name                                      | Creator | Assignee |
+| ---------------------------------------------- | ------- | -------- |
+| Create use flow diagram showing app navigation | Kyryl   | Shayla   |
+| Create basic screen desing                     | Kyryl   | Shayla   |
+| /wireframes initial design                     | Kyryl   | Shayla   |
+| Decide project timeline                        | Kyryl   | Kyryl    |
+| Select Application Idea                        | Kyryl   |          |
+| Device MVP Feature List                        | Kyryl   |          |
+| Select Tech stack                              | Kyryl   | Kyryl    |
+| Assign roles for each team member              | Kyryl   | Kyryl    |
+| Create Software Development Plan               | Kyryl   | Kyryl    |
+| Select Time for Sync                           | Kyryl   | Kyryl    |
+| Configure GitHub Project Board                 | Kyryl   | Kyryl    |
+| Configure GitHub Repo                          | Kyryl   | Kyryl    |
 ## Bugs or blockers
-
-- None this Sprint
+| Task Name                                    | Creator | Assignee |
+| -------------------------------------------- | ------- | -------- |
+| Troubleshot Supabase import issues with Expo | Kyryl   | Henry    |
 ## Key wins and challenges
 ### Wins:
-- First working version of app was created
-- The first retrospective on team sync was conducted.
-- No other issues occurred
+- We was able to schedule time for a weekly sync
+- We selected app name and idea, MVP features, tech stack
+- Everyone was assigned roles they wanted
+- App designs for flow and interface was created
 ### Challenges
-- First big PR had merge conflicts, but it was 
+- Selecting time for sync was not that obvious, but we was able to pick good time for that.
 ### Next Sprit Priorities
-- Work on improving the app's design.
-- Work on improving app functionality
+- Finish Navigation & State assignment
+- Complete first retrospective
