@@ -1,7 +1,5 @@
-# ⚠️ Not ready yet, because week still not ended
-
 ## Completed tasks
-This week we created first version of out WellMind app, with basic functionality.
+This week, we created the first version of our WellMind app with its basic functionality. Henry did awesome work on the first version of the app. This version has journal and task features, and you can select your mood. Next week, more tasks will be shared with other members to focus on improving the app.
 ### Tasks:
 | Task Name                                                                                                         | Creator | Assignee |
 | ----------------------------------------------------------------------------------------------------------------- | ------- | -------- |
@@ -19,7 +17,8 @@ This week we created first version of out WellMind app, with basic functionality
 - The first retrospective on team sync was conducted.
 - No other issues occurred
 ### Challenges
-- First big PR had merge conflicts, but it was 
+- First big PR had merge conflicts, but it was fixed
 ### Next Sprit Priorities
 - Work on improving the app's design.
 - Work on improving app functionality
+- Fixing bugs
