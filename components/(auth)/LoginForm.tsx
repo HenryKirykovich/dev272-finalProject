@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
 
 // Regular expression to validate email format
@@ -78,6 +79,11 @@ export default function LoginForm() {
           keyboardShouldPersistTaps='handled'
         >
           <View style={styles.container}>
+            <WellMindLogo
+              width={100}
+              height={100}
+              style={{ alignSelf: 'center', marginBottom: 20 }}
+            />
             <Text style={styles.title}>Login to WellMind</Text>
 
             {/* Email input */}

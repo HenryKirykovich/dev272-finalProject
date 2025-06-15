@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
 
 export default function ProfileForm() {
@@ -149,22 +150,13 @@ export default function ProfileForm() {
           keyboardShouldPersistTaps='handled'
         >
           <View style={styles.container}>
-            <View style={styles.textBgWrapper}>
-              <ImageBackground
-                source={require('../../assets/images/velvet3.png')}
-                style={StyleSheet.absoluteFillObject}
-                imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode='cover'
-              />
-              <View style={styles.textBgContent}>
-                <Text style={[styles.title, { color: '#000' }]}>WellMind</Text>
-                <Text style={[styles.subtitle, { color: '#000' }]}>
-                  mental health
-                </Text>
-                <Text style={[styles.subtitle, { color: '#000' }]}>
-                  journal
-                </Text>
-              </View>
+            <View style={styles.logoWrapper}>
+              <WellMindLogo width={120} height={120} />
+              <Text style={[styles.title, { color: '#000' }]}>WellMind</Text>
+              <Text style={[styles.subtitle, { color: '#000' }]}>
+                mental health
+              </Text>
+              <Text style={[styles.subtitle, { color: '#000' }]}>journal</Text>
             </View>
 
             <TextInput
@@ -232,20 +224,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     margin: 16,
   },
-  textBgWrapper: {
-    position: 'relative',
-    marginBottom: 24,
-    borderRadius: 16,
-    overflow: 'hidden',
-    minHeight: 200,
-    justifyContent: 'center',
-    width: '100%',
-  },
-  textBgContent: {
+  logoWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    zIndex: 1,
+    marginBottom: 24,
+    width: '100%',
   },
   title: {
     fontSize: 36,

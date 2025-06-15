@@ -13,6 +13,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+
+import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
 
 export default function WellMindScreen() {
@@ -120,17 +122,11 @@ export default function WellMindScreen() {
             keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.textBgWrapper}>
-              <ImageBackground
-                source={require('../../assets/images/velvet3.png')}
-                style={StyleSheet.absoluteFillObject}
-                imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode='cover'
-              />
-              <View style={styles.textBgContent}>
-                <Text style={styles.title}>WellMind</Text>
-                <Text style={styles.subtitle}>Your mental wellness center</Text>
-              </View>
+            {/* HEADER */}
+            <View style={styles.logoWrapper}>
+              <WellMindLogo width={140} height={140} />
+              <Text style={styles.title}>WellMind</Text>
+              <Text style={styles.subtitle}>Your mental wellness center</Text>
             </View>
 
             {mainGoal && (
@@ -195,20 +191,11 @@ const styles = StyleSheet.create({
   background: { flex: 1 },
   container: { flex: 1, justifyContent: 'space-between', padding: 20 },
   scrollContent: { flexGrow: 1, alignItems: 'center' },
-  textBgWrapper: {
-    position: 'relative',
-    marginBottom: 24,
-    borderRadius: 16,
-    overflow: 'hidden',
-    minHeight: 220,
-    justifyContent: 'center',
-    width: '100%',
-  },
-  textBgContent: {
+  logoWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    zIndex: 1,
+    marginBottom: 24,
+    width: '100%',
   },
   title: { fontSize: 36, fontWeight: 'bold', color: '#000' },
   subtitle: { fontSize: 18, color: '#000' },
