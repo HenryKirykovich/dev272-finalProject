@@ -3,6 +3,11 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { ActivityIndicator } from 'react-native';
 
+// 👇 Добавь эту строку ПЕРЕД экспортом компонента
+export const unstable_settings = {
+  showDebugInfo: false,
+};
+
 export default function RootLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 

@@ -1,3 +1,6 @@
+//app/(main)/wellmind.tsx
+// WellMind Screen for displaying mood and daily goals
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -26,10 +29,18 @@ export default function WellMindScreen() {
   }, []);
 
   const loadTodayMood = async () => {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user) return;
+
     const { data } = await supabase
       .from('mood_logs')
       .select('mood')
       .eq('logged_at', todayISO)
+      .eq('user_id', user.id)
       .single();
 
     if (data?.mood) {
@@ -38,15 +49,23 @@ export default function WellMindScreen() {
   };
 
   const loadMainGoal = async () => {
-    const { data, error } = await supabase
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user) return;
+
+    const { data } = await supabase
       .from('daily_goals')
       .select('title')
       .eq('show_on_home', true)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
 
-    if (!error && data) {
+    if (data) {
       setMainGoal(data.title);
     }
   };
@@ -54,29 +73,31 @@ export default function WellMindScreen() {
   const handleMoodSelect = async (mood: string) => {
     setSelectedMood(mood);
 
-    const { data } = await supabase
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user) return;
+
+    const { data: existing } = await supabase
       .from('mood_logs')
       .select('id')
       .eq('logged_at', todayISO)
+      .eq('user_id', user.id)
       .single();
 
-    if (data?.id) {
+    if (existing?.id) {
       await supabase
         .from('mood_logs')
         .update({ mood })
-        .eq('id', data.id);
+        .eq('id', existing.id);
     } else {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        await supabase.from('mood_logs').insert({
-          mood,
-          user_id: user.id,
-          logged_at: todayISO,
-        });
-      }
+      await supabase.from('mood_logs').insert({
+        mood,
+        user_id: user.id,
+        logged_at: todayISO,
+      });
     }
   };
 
@@ -102,7 +123,6 @@ export default function WellMindScreen() {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {/* HEADER */}
             <View style={styles.textBgWrapper}>
               <ImageBackground
                 source={require('../../assets/images/velvet3.png')}
@@ -116,14 +136,12 @@ export default function WellMindScreen() {
               </View>
             </View>
 
-            {/* MAIN GOAL */}
             {mainGoal && (
               <View style={styles.goalBox}>
                 <Text style={styles.goalText}>🎯 Today's Goal: {mainGoal}</Text>
               </View>
             )}
 
-            {/* MOODS */}
             <Text style={styles.moodPrompt}>How are you feeling today?</Text>
             <View style={styles.emojiRow}>
               {['😐', '🙂', '😔'].map((emoji) => (
@@ -147,7 +165,6 @@ export default function WellMindScreen() {
             )}
           </ScrollView>
 
-          {/* FOOTER */}
           <View style={styles.footerBox}>
             <TouchableOpacity
               style={styles.footerButton}
@@ -160,6 +177,12 @@ export default function WellMindScreen() {
               onPress={() => router.push('/(tabs)/goals')}
             >
               <Text style={styles.footerButtonText}>Goals</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => router.push('/(tabs)/mood-graph')}
+            >
+              <Text style={styles.footerButtonText}>Mood Chart</Text>
             </TouchableOpacity>
           </View>
         </View>

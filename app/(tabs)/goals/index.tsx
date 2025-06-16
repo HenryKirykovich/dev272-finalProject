@@ -1,3 +1,6 @@
+//app/(tabs)/goals/index.tsx
+// Goals Screen for Daily Goals Management  
+
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
@@ -28,20 +31,34 @@ export default function GoalsScreen() {
   const today = new Date().toISOString().split('T')[0];
 
   const fetchGoals = async () => {
-    const { data, error } = await supabase
-      .from('daily_goals')
-      .select('*')
-      .order('created_at', { ascending: false });
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-    if (!error && data) {
-      const sorted = [...data].sort((a, b) => {
-        if (a.show_on_home === b.show_on_home) return 0;
-        return a.show_on_home ? -1 : 1;
-      });
-      setGoals(sorted);
-    }
-  };
+  if (userError || !user) {
+    console.error('No authenticated user:', userError);
+    return;
+  }
 
+  const { data, error } = await supabase
+    .from('daily_goals')
+    .select('*')
+    .eq('user_id', user.id) // ✅ фильтрация по текущему пользователю
+    .order('created_at', { ascending: false });
+
+  if (!error && data) {
+    const sorted = [...data].sort((a, b) => {
+      if (a.show_on_home === b.show_on_home) return 0;
+      return a.show_on_home ? -1 : 1;
+    });
+    setGoals(sorted);
+  } else {
+    console.error('Error fetching goals:', error);
+  }
+};
+  
+  
   const toggleGoalStatus = async (goal: Goal) => {
     const { error } = await supabase
       .from('daily_goals')

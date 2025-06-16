@@ -1,0 +1,277 @@
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ImageBackground,
+  ActivityIndicator,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
+import { useRouter } from 'expo-router';
+import { supabase } from '../../lib/supabase';
+
+function mapMoodToValue(mood: string): number {
+  switch (mood) {
+    case '🙂': return 3;
+    case '😐': return 2;
+    case '😔': return 1;
+    default: return 0;
+  }
+}
+
+function formatDateLabel(dateStr: string): string {
+  const date = new Date(dateStr);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+
+export default function MoodGraphScreen() {
+  const [labels, setLabels] = useState<string[]>([]);
+  const [values, setValues] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState<'week' | 'month' | 'all'>('week');
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchMoodLogs = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      let dateFrom = new Date();
+      if (range === 'week') {
+        dateFrom.setDate(dateFrom.getDate() - 6);
+      } else if (range === 'month') {
+        dateFrom.setMonth(dateFrom.getMonth() - 1);
+      } else {
+        dateFrom = new Date('2024-01-01');
+      }
+
+      const { data, error } = await supabase
+        .from('mood_logs')
+        .select('mood, logged_at')
+        .eq('user_id', user.id)
+        .gte('logged_at', dateFrom.toISOString())
+        .order('logged_at', { ascending: true });
+
+      if (data && !error) {
+        const xLabels = data.map((entry) => formatDateLabel(entry.logged_at));
+        const yValues = data.map((entry) => mapMoodToValue(entry.mood));
+        setLabels(xLabels);
+        setValues(yValues);
+      }
+
+      setLoading(false);
+    };
+
+    fetchMoodLogs();
+  }, [range]);
+
+  // 🎯 Adaptive X-axis labels based on selected range
+  const reducedLabels = labels.map((label, i, arr) => {
+    if (range === 'week') return label;
+    if (range === 'month') {
+      const mid = Math.floor(arr.length / 2);
+      return i === 0 || i === mid || i === arr.length - 1 ? label : '';
+    }
+    if (range === 'all') {
+      return i === 0 || i === arr.length - 1 ? label : '';
+    }
+    return '';
+  });
+
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ImageBackground
+        source={require('../../assets/images/velvet.jpg')}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <View style={styles.container}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* HEADER */}
+            <View style={styles.textBgWrapper}>
+              <ImageBackground
+                source={require('../../assets/images/velvet3.png')}
+                style={StyleSheet.absoluteFillObject}
+                imageStyle={{ opacity: 0.5, borderRadius: 16 }}
+                resizeMode="cover"
+              />
+              <View style={styles.textBgContent}>
+                <Text style={styles.title}>Mood Chart</Text>
+                <Text style={styles.subtitle}>Track your mood over time</Text>
+              </View>
+            </View>
+
+            {/* RANGE SELECTOR */}
+            <View style={{ flexDirection: 'row', marginBottom: 12 }}>
+              {['week', 'month', 'all'].map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  style={[
+                    styles.rangeButton,
+                    range === r && styles.rangeButtonSelected,
+                  ]}
+                  onPress={() => setRange(r as any)}
+                >
+                  <Text style={styles.rangeButtonText}>
+                    {r.charAt(0).toUpperCase() + r.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* CHART */}
+            {loading ? (
+              <ActivityIndicator size="large" style={{ marginTop: 60 }} />
+            ) : values.length === 0 ? (
+              <Text style={{ color: '#000' }}>No data for selected range</Text>
+            ) : (
+              <LineChart
+                data={{
+                  labels: reducedLabels,
+                  datasets: [{ data: values }],
+                }}
+                width={Dimensions.get('window').width - 40}
+                height={240}
+                yAxisInterval={1}
+                chartConfig={{
+                  backgroundColor: '#fff',
+                  backgroundGradientFrom: '#e0caff',
+                  backgroundGradientTo: '#fff',
+                  decimalPlaces: 0,
+                  color: (opacity = 1) => `rgba(106, 102, 163, ${opacity})`,
+                  labelColor: () => '#333',
+                  propsForDots: {
+                    r: '4',
+                    strokeWidth: '2',
+                    stroke: '#6a66a3',
+                  },
+                  fillShadowGradient: '#6a66a3',
+                  fillShadowGradientOpacity: 0.2,
+                }}
+                bezier
+                withInnerLines={false}
+                withOuterLines={false}
+                style={{ borderRadius: 16, marginTop: 10 }}
+              />
+            )}
+
+            {/* MOOD LEGEND */}
+            <View
+  style={{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    marginBottom: 30,
+    paddingHorizontal: 10,
+  }}
+>
+  <View style={{ flex: 1, alignItems: 'center' }}>
+    <Text style={{ fontSize: 40 }}>😔</Text>
+    <Text style={{ fontSize: 14, color: '#333' }}>Sad</Text>
+  </View>
+  <View style={{ flex: 1, alignItems: 'center' }}>
+    <Text style={{ fontSize: 40 }}>😐</Text>
+    <Text style={{ fontSize: 14, color: '#333' }}>Neutral</Text>
+  </View>
+  <View style={{ flex: 1, alignItems: 'center' }}>
+    <Text style={{ fontSize: 40 }}>🙂</Text>
+    <Text style={{ fontSize: 14, color: '#333' }}>Happy</Text>
+  </View>
+</View>
+
+            
+            
+            
+          </ScrollView>
+
+          {/* FOOTER */}
+          <View style={styles.footerBox}>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => router.push('/(main)/wellmind')}
+            >
+              <Text style={styles.footerButtonText}>Home</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ImageBackground>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  background: { flex: 1 },
+  container: { flex: 1, justifyContent: 'space-between', padding: 20 },
+  scrollContent: { flexGrow: 1, alignItems: 'center' },
+  textBgWrapper: {
+    position: 'relative',
+    marginBottom: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    minHeight: 180,
+    justifyContent: 'center',
+    width: '100%',
+  },
+  textBgContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
+    zIndex: 1,
+  },
+  title: { fontSize: 30, fontWeight: 'bold', color: '#000' },
+  subtitle: { fontSize: 16, color: '#000' },
+
+  rangeButton: {
+    flex: 1,
+    paddingVertical: 8,
+    marginHorizontal: 4,
+    borderRadius: 10,
+    backgroundColor: '#ccc',
+    alignItems: 'center',
+  },
+  rangeButtonSelected: {
+    backgroundColor: '#6a66a3',
+  },
+  rangeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+
+  footerBox: {
+    flexDirection: 'row',
+    backgroundColor: '#b5838d',
+    borderRadius: 20,
+    padding: 16,
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  footerButton: {
+    flex: 1,
+    backgroundColor: '#6a66a3',
+    paddingVertical: 12,
+    marginHorizontal: 6,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  footerButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+});

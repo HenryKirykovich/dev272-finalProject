@@ -1,4 +1,8 @@
 // journal/index.tsx
+
+
+// app/(tabs)/journal/index.tsx
+// Journal Screen for displaying user's journal entries
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
@@ -25,15 +29,28 @@ export default function JournalScreen() {
   const [entries, setEntries] = useState<Entry[]>([]);
 
   const fetchEntries = async () => {
-    const { data, error } = await supabase
-      .from('journal_entries')
-      .select('*')
-      .order('created_at', { ascending: false });
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-    if (!error && data) {
-      setEntries(data);
-    }
-  };
+  if (userError || !user) {
+    console.error('User not authenticated:', userError);
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .select('*')
+    .eq('user_id', user.id) // 👈 Фильтрация по текущему пользователю
+    .order('created_at', { ascending: false });
+
+  if (!error && data) {
+    setEntries(data);
+  } else {
+    console.error('Error fetching journal entries:', error);
+  }
+};
 
   useFocusEffect(
     useCallback(() => {
