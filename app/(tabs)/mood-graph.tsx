@@ -73,7 +73,6 @@ export default function MoodGraphScreen() {
     fetchMoodLogs();
   }, [range]);
 
-  // 🎯 Adaptive X-axis labels based on selected range
   const reducedLabels = labels.map((label, i, arr) => {
     if (range === 'week') return label;
     if (range === 'month') {
@@ -121,10 +120,7 @@ export default function MoodGraphScreen() {
               {['week', 'month', 'all'].map((r) => (
                 <TouchableOpacity
                   key={r}
-                  style={[
-                    styles.rangeButton,
-                    range === r && styles.rangeButtonSelected,
-                  ]}
+                  style={[styles.rangeButton, range === r && styles.rangeButtonSelected]}
                   onPress={() => setRange(r as any)}
                 >
                   <Text style={styles.rangeButtonText}>
@@ -147,7 +143,13 @@ export default function MoodGraphScreen() {
                 }}
                 width={Dimensions.get('window').width - 40}
                 height={240}
+                yLabelsOffset={8}
                 yAxisInterval={1}
+                yAxisLabel=""
+                yAxisSuffix=""
+                fromZero
+                withInnerLines={false}
+                withOuterLines={false}
                 chartConfig={{
                   backgroundColor: '#fff',
                   backgroundGradientFrom: '#e0caff',
@@ -164,39 +166,26 @@ export default function MoodGraphScreen() {
                   fillShadowGradientOpacity: 0.2,
                 }}
                 bezier
-                withInnerLines={false}
-                withOuterLines={false}
                 style={{ borderRadius: 16, marginTop: 10 }}
+                segments={3}
+                formatYLabel={(val) => {
+                  if (val === '1') return 'Sad';
+                  if (val === '2') return 'Neutral';
+                  if (val === '3') return 'Happy';
+                  return '';
+                }}
               />
             )}
 
-            {/* MOOD LEGEND */}
-            <View
-  style={{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-    marginBottom: 30,
-    paddingHorizontal: 10,
-  }}
->
-  <View style={{ flex: 1, alignItems: 'center' }}>
-    <Text style={{ fontSize: 40 }}>😔</Text>
-    <Text style={{ fontSize: 14, color: '#333' }}>Sad</Text>
-  </View>
-  <View style={{ flex: 1, alignItems: 'center' }}>
-    <Text style={{ fontSize: 40 }}>😐</Text>
-    <Text style={{ fontSize: 14, color: '#333' }}>Neutral</Text>
-  </View>
-  <View style={{ flex: 1, alignItems: 'center' }}>
-    <Text style={{ fontSize: 40 }}>🙂</Text>
-    <Text style={{ fontSize: 14, color: '#333' }}>Happy</Text>
-  </View>
-</View>
-
-            
-            
-            
+            {/* MOOD LEGEND EXPLANATION */}
+            <View style={styles.moodLegendWrapper}>
+              <Text style={styles.moodLegendTitle}>Mood Scale:</Text>
+              <View style={styles.moodLegendRow}>
+                <Text style={styles.moodLegendLabel}>1 = Sad 😔</Text>
+                <Text style={styles.moodLegendLabel}>2 = Neutral 😐</Text>
+                <Text style={styles.moodLegendLabel}>3 = Happy 🙂</Text>
+              </View>
+            </View>
           </ScrollView>
 
           {/* FOOTER */}
@@ -235,7 +224,6 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 30, fontWeight: 'bold', color: '#000' },
   subtitle: { fontSize: 16, color: '#000' },
-
   rangeButton: {
     flex: 1,
     paddingVertical: 8,
@@ -252,7 +240,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
-
   footerBox: {
     flexDirection: 'row',
     backgroundColor: '#b5838d',
@@ -273,5 +260,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  moodLegendWrapper: {
+    backgroundColor: '#ffffffcc',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginTop: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  moodLegendTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 6,
+  },
+  moodLegendRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  moodLegendLabel: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#333',
   },
 });
