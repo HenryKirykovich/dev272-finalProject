@@ -1,18 +1,18 @@
 // app/(tabs)/goals/index.tsx
 // Goals Screen: Daily goal tracking for authenticated users
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
 
 interface Goal {
@@ -96,7 +96,7 @@ export default function GoalsScreen() {
   // 📆 Filter today's goals unless "Show All" is enabled
   const filteredGoals = showAll
     ? goals
-    : goals.filter((g) => g.created_at.startsWith(today));
+    : goals.filter(g => g.created_at.startsWith(today));
 
   // 🔧 Goal list item renderer
   const renderItem = ({ item }: { item: Goal }) => (
@@ -145,7 +145,7 @@ export default function GoalsScreen() {
       <ImageBackground
         source={require('../../../assets/images/velvet.jpg')}
         style={styles.background}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <View style={styles.container}>
           <View style={styles.header}>
@@ -160,7 +160,7 @@ export default function GoalsScreen() {
           <FlatList
             data={filteredGoals}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             contentContainerStyle={{ paddingBottom: 20 }}
             showsVerticalScrollIndicator={false}
           />

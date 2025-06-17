@@ -1,8 +1,8 @@
 // components/MoodReminder.tsx
 // This component schedules a local push notification reminding the user about their current mood
 
-import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
+import { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { supabase } from '../lib/supabase';
 

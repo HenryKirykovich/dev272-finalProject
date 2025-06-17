@@ -10,17 +10,14 @@ export default function AuthLayout() {
       }}
     >
       <Stack.Screen
-        name="login"
+        name='login'
         options={{ title: 'Login', headerLeft: () => null }}
       />
       <Stack.Screen
-        name="register"
+        name='register'
         options={{ title: 'Register', headerLeft: () => null }}
       />
-      <Stack.Screen
-        name="profile-form"
-        options={{ title: 'My Profile' }}
-      />
+      <Stack.Screen name='profile-form' options={{ title: 'My Profile' }} />
     </Stack>
   );
 }

@@ -22,7 +22,9 @@ export default function NewEntryScreen() {
   const router = useRouter();
 
   const handleSave = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       Alert.alert('Error', 'User not authenticated.');
@@ -44,17 +46,17 @@ export default function NewEntryScreen() {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}  //adjecting GAP between keyboard and typing text
+      keyboardVerticalOffset={0} //adjecting GAP between keyboard and typing text
     >
       <ImageBackground
         source={require('../../../assets/images/velvet.jpg')}
         style={styles.background}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <View style={styles.container}>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.textBgWrapper}>
@@ -68,8 +70,8 @@ export default function NewEntryScreen() {
               <TextInput
                 value={text}
                 onChangeText={setText}
-                placeholder="Type here..."
-                placeholderTextColor="#fff"
+                placeholder='Type here...'
+                placeholderTextColor='#fff'
                 style={styles.input}
                 multiline
               />

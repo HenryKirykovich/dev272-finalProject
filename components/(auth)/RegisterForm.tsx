@@ -70,43 +70,45 @@ export default function RegisterForm() {
       <ImageBackground
         source={require('../../assets/images/velvet.jpg')}
         style={{ flex: 1 }}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps='handled'
         >
           <View style={styles.container}>
             <Text style={styles.title}>Create Your Account</Text>
 
             {/* Email input field */}
             <TextInput
-              placeholder="Email"
+              placeholder='Email'
               value={email}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setEmail(text);
                 validateEmail(text);
               }}
-              autoCapitalize="none"
-              keyboardType="email-address"
+              autoCapitalize='none'
+              keyboardType='email-address'
               style={styles.input}
-              placeholderTextColor="#000"
+              placeholderTextColor='#000'
             />
             {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
             {/* Password input field */}
             <TextInput
-              placeholder="Password"
+              placeholder='Password'
               value={password}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setPassword(text);
                 validatePassword(text);
               }}
               secureTextEntry
               style={styles.input}
-              placeholderTextColor="#000"
+              placeholderTextColor='#000'
             />
-            {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
+            {passwordError && (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            )}
 
             {/* Submit button */}
             <TouchableOpacity style={styles.button} onPress={handleRegister}>

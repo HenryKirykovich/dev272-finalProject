@@ -5,7 +5,6 @@ import { ActivityIndicator, Alert } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
-
 export const unstable_settings = {
   showDebugInfo: false,
 };
@@ -24,9 +23,11 @@ export default function RootLayout() {
     });
 
     // Optional: handle notification received while app is in foreground
-    const subscription = Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notification Received:', notification);
-    });
+    const subscription = Notifications.addNotificationReceivedListener(
+      notification => {
+        console.log('Notification Received:', notification);
+      }
+    );
 
     return () => subscription.remove();
   }, []);
@@ -35,9 +36,15 @@ export default function RootLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {!isLoggedIn && <Stack.Screen name="(auth)" options={{ headerShown: false }} />}
-      {isLoggedIn && <Stack.Screen name="(main)" options={{ headerShown: false }} />}
-      {isLoggedIn && <Stack.Screen name="(tabs)" options={{ headerShown: false }} />}
+      {!isLoggedIn && (
+        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+      )}
+      {isLoggedIn && (
+        <Stack.Screen name='(main)' options={{ headerShown: false }} />
+      )}
+      {isLoggedIn && (
+        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+      )}
     </Stack>
   );
 }

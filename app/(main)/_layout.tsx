@@ -10,7 +10,9 @@ export default function MainLayout() {
 
   useEffect(() => {
     const fetchFullName = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
       const { data, error } = await supabase
         .from('users')
