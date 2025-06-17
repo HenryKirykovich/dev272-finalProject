@@ -17,7 +17,6 @@ import { supabase } from '../../lib/supabase';
 
 export default function ProfileForm() {
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [alreadyExists, setAlreadyExists] = useState(false);
   const router = useRouter();
@@ -30,7 +29,7 @@ export default function ProfileForm() {
       } = await supabase.auth.getUser();
       if (userError || !user) return;
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('users')
         .select('*')
         .eq('id', user.id)
@@ -38,7 +37,6 @@ export default function ProfileForm() {
 
       if (data) {
         setFullName(data.full_name || '');
-        setPhone(data.phone_number || '');
         setAlreadyExists(true);
       }
     };
@@ -47,8 +45,8 @@ export default function ProfileForm() {
   }, []);
 
   const handleSaveProfile = async () => {
-    if (!fullName.trim() || !phone.trim()) {
-      Alert.alert('Error', 'Full Name and Phone Number cannot be empty.');
+    if (!fullName.trim()) {
+      Alert.alert('Error', 'Full Name cannot be empty.');
       return;
     }
 
@@ -63,14 +61,13 @@ export default function ProfileForm() {
       const { error } = await supabase.from('users').insert({
         id: user.id,
         full_name: fullName,
-        phone_number: phone,
         email: user.email,
       });
       profileError = error;
     } else {
       const { error } = await supabase
         .from('users')
-        .update({ full_name: fullName, phone_number: phone })
+        .update({ full_name: fullName })
         .eq('id', user.id);
       profileError = error;
     }
@@ -80,7 +77,6 @@ export default function ProfileForm() {
     } else {
       Alert.alert('✅ Success', 'Profile updated successfully!');
       setFullName('');
-      setPhone('');
     }
   };
 
@@ -165,14 +161,6 @@ export default function ProfileForm() {
               placeholderTextColor='#999'
               onChangeText={setFullName}
               value={fullName}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder='Phone Number'
-              placeholderTextColor='#999'
-              keyboardType='phone-pad'
-              onChangeText={setPhone}
-              value={phone}
             />
 
             <TouchableOpacity style={styles.button} onPress={handleSaveProfile}>

@@ -27,6 +27,8 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [nameError, setNameError] = useState('');
   const router = useRouter();
 
   // Email validation function
@@ -51,15 +53,37 @@ export default function RegisterForm() {
 
   // Handles user registration via Supabase
   const handleRegister = async () => {
+    if (!fullName.trim()) {
+      setNameError('Please enter your name');
+      return;
+    }
+    setNameError('');
+
     if (!validateEmail(email) || !validatePassword(password)) return;
 
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       setPasswordError(error.message);
-    } else {
-      Alert.alert('Success', 'Check your email to confirm.');
-      router.replace('/(main)/wellmind');
+      return;
     }
+
+    const user = data?.user;
+    if (user) {
+      // Insert initial profile row
+      const { error: insertError } = await supabase.from('users').insert({
+        id: user.id,
+        full_name: fullName,
+        email,
+      });
+
+      if (insertError) {
+        Alert.alert('Profile Error', insertError.message);
+        // We don't return here so user can still proceed
+      }
+    }
+
+    Alert.alert('Success', 'Check your email to confirm.');
+    router.replace('/(main)/wellmind');
   };
 
   return (
@@ -84,6 +108,21 @@ export default function RegisterForm() {
               style={{ alignSelf: 'center', marginBottom: 20 }}
             />
             <Text style={styles.title}>Create Your Account</Text>
+
+            {/* Name input field */}
+            <TextInput
+              placeholder='Full Name'
+              value={fullName}
+              onChangeText={text => {
+                setFullName(text);
+                if (text.trim()) {
+                  setNameError('');
+                }
+              }}
+              style={styles.input}
+              placeholderTextColor='#000'
+            />
+            {nameError && <Text style={styles.errorText}>{nameError}</Text>}
 
             {/* Email input field */}
             <TextInput
