@@ -5,20 +5,20 @@ export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
-        name="journal"
+        name='journal'
         options={{
           title: 'Journal',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="book-outline" size={size} color={color} />
+            <Ionicons name='book-outline' size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="goals" // Переименованная папка
+        name='goals' // Переименованная папка
         options={{
           title: 'Goals',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="checkmark-done-outline" size={size} color={color} />
+            <Ionicons name='checkmark-done-outline' size={size} color={color} />
           ),
         }}
       />

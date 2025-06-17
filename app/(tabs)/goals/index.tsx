@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
 
 interface Goal {
@@ -74,7 +74,7 @@ export default function GoalsScreen() {
 
   const filteredGoals = showAll
     ? goals
-    : goals.filter((g) => g.created_at.startsWith(today));
+    : goals.filter(g => g.created_at.startsWith(today));
 
   const renderItem = ({ item }: { item: Goal }) => (
     <View style={[styles.goalBox, item.is_done && styles.goalDone]}>
@@ -120,7 +120,7 @@ export default function GoalsScreen() {
       <ImageBackground
         source={require('../../../assets/images/velvet.jpg')}
         style={styles.background}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <View style={styles.container}>
           <View style={styles.header}>
@@ -135,7 +135,7 @@ export default function GoalsScreen() {
           <FlatList
             data={filteredGoals}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             contentContainerStyle={{ paddingBottom: 20 }}
             showsVerticalScrollIndicator={false}
           />

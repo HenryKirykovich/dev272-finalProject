@@ -61,10 +61,7 @@ export default function WellMindScreen() {
       .single();
 
     if (data?.id) {
-      await supabase
-        .from('mood_logs')
-        .update({ mood })
-        .eq('id', data.id);
+      await supabase.from('mood_logs').update({ mood }).eq('id', data.id);
     } else {
       const {
         data: { user },
@@ -94,12 +91,12 @@ export default function WellMindScreen() {
       <ImageBackground
         source={require('../../assets/images/velvet.jpg')}
         style={styles.background}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <View style={styles.container}>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
             {/* HEADER */}
@@ -108,7 +105,7 @@ export default function WellMindScreen() {
                 source={require('../../assets/images/velvet3.png')}
                 style={StyleSheet.absoluteFillObject}
                 imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode="cover"
+                resizeMode='cover'
               />
               <View style={styles.textBgContent}>
                 <Text style={styles.title}>WellMind</Text>
@@ -126,8 +123,11 @@ export default function WellMindScreen() {
             {/* MOODS */}
             <Text style={styles.moodPrompt}>How are you feeling today?</Text>
             <View style={styles.emojiRow}>
-              {['😐', '🙂', '😔'].map((emoji) => (
-                <TouchableOpacity key={emoji} onPress={() => handleMoodSelect(emoji)}>
+              {['😐', '🙂', '😔'].map(emoji => (
+                <TouchableOpacity
+                  key={emoji}
+                  onPress={() => handleMoodSelect(emoji)}
+                >
                   <Text
                     style={[
                       styles.emoji,

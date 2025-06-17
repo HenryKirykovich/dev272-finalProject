@@ -16,9 +16,15 @@ export default function RootLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {!isLoggedIn && <Stack.Screen name="(auth)" options={{ headerShown: false }} />}
-      {isLoggedIn && <Stack.Screen name="(main)" options={{ headerShown: false }} />}
-      {isLoggedIn && <Stack.Screen name="(tabs)" options={{ headerShown: false }} />}
+      {!isLoggedIn && (
+        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+      )}
+      {isLoggedIn && (
+        <Stack.Screen name='(main)' options={{ headerShown: false }} />
+      )}
+      {isLoggedIn && (
+        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+      )}
     </Stack>
   );
 }
