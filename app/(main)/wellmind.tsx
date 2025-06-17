@@ -1,18 +1,18 @@
 //app/(main)/wellmind.tsx
 // WellMind Screen for displaying mood and daily goals
 
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
   ImageBackground,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 
 export default function WellMindScreen() {
