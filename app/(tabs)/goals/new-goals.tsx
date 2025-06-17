@@ -23,7 +23,9 @@ export default function NewGoalScreen() {
   const router = useRouter();
 
   const handleSave = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       Alert.alert('Error', 'User not authenticated.');
@@ -50,18 +52,20 @@ export default function NewGoalScreen() {
       <ImageBackground
         source={require('../../../assets/images/velvet.jpg')}
         style={styles.background}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <View style={styles.container}>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.textBgWrapper}>
               <View style={styles.textBgContent}>
                 <Text style={styles.title}>New Goal</Text>
-                <Text style={styles.subtitle}>Describe your goal for today</Text>
+                <Text style={styles.subtitle}>
+                  Describe your goal for today
+                </Text>
               </View>
             </View>
 
@@ -69,8 +73,8 @@ export default function NewGoalScreen() {
               <TextInput
                 value={goal}
                 onChangeText={setGoal}
-                placeholder="Type your goal..."
-                placeholderTextColor="#fff"
+                placeholder='Type your goal...'
+                placeholderTextColor='#fff'
                 style={styles.input}
                 multiline
               />

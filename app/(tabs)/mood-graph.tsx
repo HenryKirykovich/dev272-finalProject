@@ -21,10 +21,14 @@ import { supabase } from '../../lib/supabase';
 // Converts mood emoji string to a numeric value for graph plotting
 function mapMoodToValue(mood: string): number {
   switch (mood) {
-    case '🙂': return 3;
-    case '😐': return 2;
-    case '😔': return 1;
-    default: return 0;
+    case '🙂':
+      return 3;
+    case '😐':
+      return 2;
+    case '😔':
+      return 1;
+    default:
+      return 0;
   }
 }
 
@@ -44,7 +48,9 @@ export default function MoodGraphScreen() {
   // Fetch mood logs from Supabase for the selected date range
   useEffect(() => {
     const fetchMoodLogs = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       let dateFrom = new Date();
@@ -64,8 +70,8 @@ export default function MoodGraphScreen() {
         .order('logged_at', { ascending: true });
 
       if (data && !error) {
-        const xLabels = data.map((entry) => formatDateLabel(entry.logged_at));
-        const yValues = data.map((entry) => mapMoodToValue(entry.mood));
+        const xLabels = data.map(entry => formatDateLabel(entry.logged_at));
+        const yValues = data.map(entry => mapMoodToValue(entry.mood));
         setLabels(xLabels);
         setValues(yValues);
       }
@@ -97,12 +103,12 @@ export default function MoodGraphScreen() {
       <ImageBackground
         source={require('../../assets/images/velvet.jpg')}
         style={styles.background}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <View style={styles.container}>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
             {/* Header */}
@@ -111,7 +117,7 @@ export default function MoodGraphScreen() {
                 source={require('../../assets/images/velvet3.png')}
                 style={StyleSheet.absoluteFillObject}
                 imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode="cover"
+                resizeMode='cover'
               />
               <View style={styles.textBgContent}>
                 <Text style={styles.title}>Mood Chart</Text>
@@ -121,10 +127,13 @@ export default function MoodGraphScreen() {
 
             {/* Range Selector */}
             <View style={{ flexDirection: 'row', marginBottom: 12 }}>
-              {['week', 'month', 'all'].map((r) => (
+              {['week', 'month', 'all'].map(r => (
                 <TouchableOpacity
                   key={r}
-                  style={[styles.rangeButton, range === r && styles.rangeButtonSelected]}
+                  style={[
+                    styles.rangeButton,
+                    range === r && styles.rangeButtonSelected,
+                  ]}
                   onPress={() => setRange(r as any)}
                 >
                   <Text style={styles.rangeButtonText}>
@@ -136,7 +145,7 @@ export default function MoodGraphScreen() {
 
             {/* Mood Chart */}
             {loading ? (
-              <ActivityIndicator size="large" style={{ marginTop: 60 }} />
+              <ActivityIndicator size='large' style={{ marginTop: 60 }} />
             ) : values.length === 0 ? (
               <Text style={{ color: '#000' }}>No data for selected range</Text>
             ) : (
@@ -149,8 +158,8 @@ export default function MoodGraphScreen() {
                 height={240}
                 yLabelsOffset={8}
                 yAxisInterval={1}
-                yAxisLabel=""
-                yAxisSuffix=""
+                yAxisLabel=''
+                yAxisSuffix=''
                 fromZero
                 withInnerLines={false}
                 withOuterLines={false}
@@ -172,7 +181,7 @@ export default function MoodGraphScreen() {
                 bezier
                 style={{ borderRadius: 16, marginTop: 10 }}
                 segments={3}
-                formatYLabel={(val) => {
+                formatYLabel={val => {
                   if (val === '1') return 'Sad';
                   if (val === '2') return 'Neutral';
                   if (val === '3') return 'Happy';

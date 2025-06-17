@@ -25,7 +25,6 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [isPasswordValid, setIsPasswordValid] = useState(true);
   const router = useRouter();
 
   // Validates email with regex
@@ -41,11 +40,9 @@ export default function LoginForm() {
   // Validates password length
   const validatePassword = (password: string) => {
     if (password.length < 6) {
-      setIsPasswordValid(false);
       setPasswordError('Password must be at least 6 characters long');
       return false;
     }
-    setIsPasswordValid(true);
     setPasswordError('');
     return true;
   };
@@ -54,7 +51,10 @@ export default function LoginForm() {
   const handleLogin = async () => {
     if (!validateEmail(email) || !validatePassword(password)) return;
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) {
       setPasswordError(error.message);
     } else {
@@ -71,43 +71,45 @@ export default function LoginForm() {
       <ImageBackground
         source={require('../../assets/images/velvet.jpg')}
         style={{ flex: 1 }}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps='handled'
         >
           <View style={styles.container}>
             <Text style={styles.title}>Login to WellMind</Text>
 
             {/* Email input */}
             <TextInput
-              placeholder="Email"
+              placeholder='Email'
               value={email}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setEmail(text);
                 validateEmail(text);
               }}
-              autoCapitalize="none"
-              keyboardType="email-address"
+              autoCapitalize='none'
+              keyboardType='email-address'
               style={styles.input}
-              placeholderTextColor="#000"
+              placeholderTextColor='#000'
             />
             {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
             {/* Password input */}
             <TextInput
-              placeholder="Password"
+              placeholder='Password'
               value={password}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setPassword(text);
                 validatePassword(text);
               }}
               secureTextEntry
               style={styles.input}
-              placeholderTextColor="#000"
+              placeholderTextColor='#000'
             />
-            {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
+            {passwordError && (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            )}
 
             {/* Login button */}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -117,7 +119,7 @@ export default function LoginForm() {
             {/* Navigation to registration */}
             <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
               <Text style={styles.link}>
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Text style={styles.linkBold}>Register</Text>
               </Text>
             </TouchableOpacity>

@@ -1,18 +1,18 @@
 //app/(main)/wellmind.tsx
 // WellMind Screen for displaying mood and daily goals
 
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
   ImageBackground,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 
 export default function WellMindScreen() {
@@ -88,10 +88,7 @@ export default function WellMindScreen() {
       .single();
 
     if (existing?.id) {
-      await supabase
-        .from('mood_logs')
-        .update({ mood })
-        .eq('id', existing.id);
+      await supabase.from('mood_logs').update({ mood }).eq('id', existing.id);
     } else {
       await supabase.from('mood_logs').insert({
         mood,
@@ -115,12 +112,12 @@ export default function WellMindScreen() {
       <ImageBackground
         source={require('../../assets/images/velvet.jpg')}
         style={styles.background}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <View style={styles.container}>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.textBgWrapper}>
@@ -128,7 +125,7 @@ export default function WellMindScreen() {
                 source={require('../../assets/images/velvet3.png')}
                 style={StyleSheet.absoluteFillObject}
                 imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode="cover"
+                resizeMode='cover'
               />
               <View style={styles.textBgContent}>
                 <Text style={styles.title}>WellMind</Text>
@@ -144,8 +141,11 @@ export default function WellMindScreen() {
 
             <Text style={styles.moodPrompt}>How are you feeling today?</Text>
             <View style={styles.emojiRow}>
-              {['😐', '🙂', '😔'].map((emoji) => (
-                <TouchableOpacity key={emoji} onPress={() => handleMoodSelect(emoji)}>
+              {['😐', '🙂', '😔'].map(emoji => (
+                <TouchableOpacity
+                  key={emoji}
+                  onPress={() => handleMoodSelect(emoji)}
+                >
                   <Text
                     style={[
                       styles.emoji,

@@ -111,11 +111,19 @@ export default function ProfileForm() {
           } = await supabase.auth.getUser();
           if (!user) return;
 
-          const { error: dbError } = await supabase.from('users').delete().eq('id', user.id);
-          const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
+          const { error: dbError } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', user.id);
+          const { error: authError } = await supabase.auth.admin.deleteUser(
+            user.id
+          );
 
           if (dbError || authError) {
-            Alert.alert('Error', dbError?.message || authError?.message || 'Unknown error');
+            Alert.alert(
+              'Error',
+              dbError?.message || authError?.message || 'Unknown error'
+            );
           } else {
             Alert.alert('Deleted', 'Your account has been deleted');
             router.replace('/(auth)/login');
@@ -134,11 +142,11 @@ export default function ProfileForm() {
       <ImageBackground
         source={require('../../assets/images/velvet.jpg')}
         style={{ flex: 1 }}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps='handled'
         >
           <View style={styles.container}>
             <View style={styles.textBgWrapper}>
@@ -146,27 +154,31 @@ export default function ProfileForm() {
                 source={require('../../assets/images/velvet3.png')}
                 style={StyleSheet.absoluteFillObject}
                 imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode="cover"
+                resizeMode='cover'
               />
               <View style={styles.textBgContent}>
                 <Text style={[styles.title, { color: '#000' }]}>WellMind</Text>
-                <Text style={[styles.subtitle, { color: '#000' }]}>mental health</Text>
-                <Text style={[styles.subtitle, { color: '#000' }]}>journal</Text>
+                <Text style={[styles.subtitle, { color: '#000' }]}>
+                  mental health
+                </Text>
+                <Text style={[styles.subtitle, { color: '#000' }]}>
+                  journal
+                </Text>
               </View>
             </View>
 
             <TextInput
               style={styles.input}
-              placeholder="Full Name"
-              placeholderTextColor="#999"
+              placeholder='Full Name'
+              placeholderTextColor='#999'
               onChangeText={setFullName}
               value={fullName}
             />
             <TextInput
               style={styles.input}
-              placeholder="Phone Number"
-              placeholderTextColor="#999"
-              keyboardType="phone-pad"
+              placeholder='Phone Number'
+              placeholderTextColor='#999'
+              keyboardType='phone-pad'
               onChangeText={setPhone}
               value={phone}
             />
@@ -177,18 +189,24 @@ export default function ProfileForm() {
 
             <TextInput
               style={styles.input}
-              placeholder="New Password (min 6 characters)"
-              placeholderTextColor="#999"
+              placeholder='New Password (min 6 characters)'
+              placeholderTextColor='#999'
               secureTextEntry
               onChangeText={setNewPassword}
               value={newPassword}
             />
 
-            <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleChangePassword}
+            >
               <Text style={styles.buttonText}>Change Password</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.danger} onPress={handleDeleteAccount}>
+            <TouchableOpacity
+              style={styles.danger}
+              onPress={handleDeleteAccount}
+            >
               <Text style={styles.buttonText}>❌ Delete Account</Text>
             </TouchableOpacity>
 

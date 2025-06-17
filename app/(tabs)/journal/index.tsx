@@ -84,7 +84,7 @@ export default function JournalScreen() {
       <ImageBackground
         source={require('../../../assets/images/velvet.jpg')}
         style={styles.background}
-        resizeMode="cover"
+        resizeMode='cover'
       >
         <View style={styles.container}>
           {/* Header */}
@@ -98,7 +98,7 @@ export default function JournalScreen() {
           <FlatList
             data={entries}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             contentContainerStyle={{ paddingBottom: 20 }}
             showsVerticalScrollIndicator={false}
           />
