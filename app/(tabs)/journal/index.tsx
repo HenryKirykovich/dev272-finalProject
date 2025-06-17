@@ -1,18 +1,18 @@
 // app/(tabs)/journal/index.tsx
 // Journal Screen for displaying user's personal journal entries
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
 
 interface Entry {
@@ -58,13 +58,25 @@ export default function JournalScreen() {
     }, [refresh])
   );
 
-  // 📅 Format entry creation date
+  // 📅 Format entry creation date and time
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
-    return date.toLocaleDateString('en-US', {
+
+    // Format date (e.g., "05 Jun")
+    const formattedDate = date.toLocaleDateString('en-US', {
       day: '2-digit',
       month: 'short',
     });
+
+    // Format time (e.g., "14:23:08")
+    const formattedTime = date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    return `${formattedDate} ${formattedTime}`;
   };
 
   // 📝 Render each journal entry

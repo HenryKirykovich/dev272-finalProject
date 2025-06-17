@@ -1,20 +1,20 @@
 // This file is part of the Journal App, a React Native application for journaling.
 //app/(tabs)/journal/new-entry.tsx
 
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
+  Alert,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
 
 export default function NewEntryScreen() {
@@ -22,6 +22,12 @@ export default function NewEntryScreen() {
   const router = useRouter();
 
   const handleSave = async () => {
+    // 🚫 Prevent saving empty entries
+    if (!text.trim()) {
+      Alert.alert('Error', 'Journal entry cannot be empty.');
+      return;
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -40,6 +46,11 @@ export default function NewEntryScreen() {
     } else {
       router.push('/(tabs)/journal');
     }
+  };
+
+  // ⏪ Navigate back to the previous screen
+  const handleBack = () => {
+    router.back();
   };
 
   return (
@@ -77,8 +88,14 @@ export default function NewEntryScreen() {
               />
             </View>
 
+            {/* Save Button */}
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+
+            {/* Back Button */}
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+              <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -152,6 +169,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   saveButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  backButton: {
+    backgroundColor: '#b5838d',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 16,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  backButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
