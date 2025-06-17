@@ -1,3 +1,7 @@
+// This file is part of the Daily Goals app, which allows users to set and track daily goals.
+// It is built using React Native and Expo, with Supabase as the backend for user authentication/
+//app/(tabs)/goals/new-goal.tsx
+
 import React, { useState } from 'react';
 import {
   View,

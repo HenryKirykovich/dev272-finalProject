@@ -1,4 +1,6 @@
-// journal/index.tsx
+// app/(tabs)/journal/index.tsx
+// Journal Screen for displaying user's personal journal entries
+
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
@@ -24,23 +26,39 @@ export default function JournalScreen() {
   const { refresh } = useLocalSearchParams();
   const [entries, setEntries] = useState<Entry[]>([]);
 
+  // 🔄 Fetch journal entries for the authenticated user
   const fetchEntries = async () => {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      console.error('User not authenticated:', userError);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('journal_entries')
       .select('*')
+      .eq('user_id', user.id) // ✅ Filter by current user
       .order('created_at', { ascending: false });
 
     if (!error && data) {
       setEntries(data);
+    } else {
+      console.error('Error fetching journal entries:', error);
     }
   };
 
+  // 🔁 Refetch on focus or if "refresh" param is passed
   useFocusEffect(
     useCallback(() => {
       fetchEntries();
     }, [refresh])
   );
 
+  // 📅 Format entry creation date
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleDateString('en-US', {
@@ -49,6 +67,7 @@ export default function JournalScreen() {
     });
   };
 
+  // 📝 Render each journal entry
   const renderItem = ({ item }: { item: Entry }) => (
     <View style={styles.entryBox}>
       <Text style={styles.entryDate}>{formatDate(item.created_at)}</Text>
@@ -56,6 +75,7 @@ export default function JournalScreen() {
     </View>
   );
 
+  // 🧱 UI Layout
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -67,14 +87,14 @@ export default function JournalScreen() {
         resizeMode="cover"
       >
         <View style={styles.container}>
-          {/* HEADER */}
+          {/* Header */}
           <View style={styles.textBgWrapper}>
             <View style={styles.textBgContent}>
               <Text style={styles.title}>My Journal</Text>
             </View>
           </View>
 
-          {/* ENTRIES */}
+          {/* List of entries */}
           <FlatList
             data={entries}
             renderItem={renderItem}
@@ -83,7 +103,7 @@ export default function JournalScreen() {
             showsVerticalScrollIndicator={false}
           />
 
-          {/* FOOTER BUTTONS */}
+          {/* Footer with navigation buttons */}
           <View style={styles.footerBox}>
             <TouchableOpacity
               style={styles.footerButton}
@@ -104,6 +124,7 @@ export default function JournalScreen() {
   );
 }
 
+// 🎨 Styles
 const styles = StyleSheet.create({
   background: {
     flex: 1,

@@ -1,3 +1,6 @@
+// This file is part of the Journal App, a React Native application for journaling.
+//app/(tabs)/journal/new-entry.tsx
+
 import React, { useState } from 'react';
 import {
   View,
