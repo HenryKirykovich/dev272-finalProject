@@ -1,3 +1,6 @@
+// MoodGraphScreen displays the user's mood history as a line chart.
+// It allows filtering by week, month, or all time.
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -15,6 +18,7 @@ import { LineChart } from 'react-native-chart-kit';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 
+// Converts mood emoji string to a numeric value for graph plotting
 function mapMoodToValue(mood: string): number {
   switch (mood) {
     case '🙂': return 3;
@@ -24,6 +28,7 @@ function mapMoodToValue(mood: string): number {
   }
 }
 
+// Formats a date string into MM/DD for chart labels
 function formatDateLabel(dateStr: string): string {
   const date = new Date(dateStr);
   return `${date.getMonth() + 1}/${date.getDate()}`;
@@ -36,12 +41,10 @@ export default function MoodGraphScreen() {
   const [range, setRange] = useState<'week' | 'month' | 'all'>('week');
   const router = useRouter();
 
+  // Fetch mood logs from Supabase for the selected date range
   useEffect(() => {
     const fetchMoodLogs = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       let dateFrom = new Date();
@@ -50,7 +53,7 @@ export default function MoodGraphScreen() {
       } else if (range === 'month') {
         dateFrom.setMonth(dateFrom.getMonth() - 1);
       } else {
-        dateFrom = new Date('2024-01-01');
+        dateFrom = new Date('2024-01-01'); // full history fallback
       }
 
       const { data, error } = await supabase
@@ -73,6 +76,7 @@ export default function MoodGraphScreen() {
     fetchMoodLogs();
   }, [range]);
 
+  // Reduce labels for wider datasets (month/all)
   const reducedLabels = labels.map((label, i, arr) => {
     if (range === 'week') return label;
     if (range === 'month') {
@@ -101,7 +105,7 @@ export default function MoodGraphScreen() {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {/* HEADER */}
+            {/* Header */}
             <View style={styles.textBgWrapper}>
               <ImageBackground
                 source={require('../../assets/images/velvet3.png')}
@@ -115,7 +119,7 @@ export default function MoodGraphScreen() {
               </View>
             </View>
 
-            {/* RANGE SELECTOR */}
+            {/* Range Selector */}
             <View style={{ flexDirection: 'row', marginBottom: 12 }}>
               {['week', 'month', 'all'].map((r) => (
                 <TouchableOpacity
@@ -130,7 +134,7 @@ export default function MoodGraphScreen() {
               ))}
             </View>
 
-            {/* CHART */}
+            {/* Mood Chart */}
             {loading ? (
               <ActivityIndicator size="large" style={{ marginTop: 60 }} />
             ) : values.length === 0 ? (
@@ -177,18 +181,18 @@ export default function MoodGraphScreen() {
               />
             )}
 
-            {/* MOOD LEGEND EXPLANATION */}
+            {/* Mood Scale Explanation */}
             <View style={styles.moodLegendWrapper}>
               <Text style={styles.moodLegendTitle}>Mood Scale:</Text>
               <View style={styles.moodLegendRow}>
-                <Text style={styles.moodLegendLabel}>1 = Sad 😔</Text>
-                <Text style={styles.moodLegendLabel}>2 = Neutral 😐</Text>
-                <Text style={styles.moodLegendLabel}>3 = Happy 🙂</Text>
+                <Text style={styles.moodLegendLabel}>1 = Sad</Text>
+                <Text style={styles.moodLegendLabel}>2 = Neutral</Text>
+                <Text style={styles.moodLegendLabel}>3 = Happy</Text>
               </View>
             </View>
           </ScrollView>
 
-          {/* FOOTER */}
+          {/* Footer Navigation */}
           <View style={styles.footerBox}>
             <TouchableOpacity
               style={styles.footerButton}

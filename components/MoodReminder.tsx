@@ -1,9 +1,12 @@
 // components/MoodReminder.tsx
+// This component schedules a local push notification reminding the user about their current mood
+
 import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { supabase } from '../lib/supabase';
 
+// Schedules a push notification based on the most recent mood entry
 export async function scheduleMoodReminder() {
   const {
     data: { user },
@@ -23,16 +26,18 @@ export async function scheduleMoodReminder() {
 
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: 'WellMind Check-In 💭',
-      body: `You're still feeling ${data.mood}? Take a moment to reflect.`,
+      title: 'WellMind Mood Reminder',
+      body: `You are still feeling ${data.mood}. Take a moment to reflect.`,
     },
-    trigger: { seconds: 15 }, // или daily время ниже
+    trigger: { seconds: 15 }, // Adjust this to schedule daily, if needed
   });
 }
 
+// React component that initializes push notification setup and scheduling
 export default function MoodReminder() {
   useEffect(() => {
     const init = async () => {
+      // Android-specific notification channel setup
       if (Platform.OS === 'android') {
         await Notifications.setNotificationChannelAsync('default', {
           name: 'default',
@@ -40,7 +45,8 @@ export default function MoodReminder() {
         });
       }
 
-      await scheduleMoodReminder(); // 👈 запускаем уведомление
+      // Schedule notification
+      await scheduleMoodReminder();
     };
 
     init();

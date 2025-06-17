@@ -1,3 +1,6 @@
+// app/(auth)/register.tsx
+// Registration screen for new users using Supabase authentication
+
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -14,15 +17,18 @@ import {
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
 
+// Regular expression for email validation
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export default function RegisterForm() {
+  // State variables for input and error messages
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const router = useRouter();
 
+  // Email validation function
   const validateEmail = (email: string) => {
     if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address');
@@ -32,6 +38,7 @@ export default function RegisterForm() {
     return true;
   };
 
+  // Password validation function
   const validatePassword = (password: string) => {
     if (password.length < 6) {
       setPasswordError('Password must be at least 6 characters long');
@@ -41,6 +48,7 @@ export default function RegisterForm() {
     return true;
   };
 
+  // Handles user registration via Supabase
   const handleRegister = async () => {
     if (!validateEmail(email) || !validatePassword(password)) return;
 
@@ -71,6 +79,7 @@ export default function RegisterForm() {
           <View style={styles.container}>
             <Text style={styles.title}>Create Your Account</Text>
 
+            {/* Email input field */}
             <TextInput
               placeholder="Email"
               value={email}
@@ -85,6 +94,7 @@ export default function RegisterForm() {
             />
             {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
+            {/* Password input field */}
             <TextInput
               placeholder="Password"
               value={password}
@@ -98,6 +108,7 @@ export default function RegisterForm() {
             />
             {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
 
+            {/* Submit button */}
             <TouchableOpacity style={styles.button} onPress={handleRegister}>
               <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
@@ -108,6 +119,7 @@ export default function RegisterForm() {
   );
 }
 
+// Style definitions
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'rgba(255,255,255,0.85)',

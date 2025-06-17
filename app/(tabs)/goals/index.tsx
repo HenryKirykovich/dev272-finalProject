@@ -1,5 +1,5 @@
-//app/(tabs)/goals/index.tsx
-// Goals Screen for Daily Goals Management  
+// app/(tabs)/goals/index.tsx
+// Goals Screen: Daily goal tracking for authenticated users
 
 import React, { useEffect, useState, useCallback } from 'react';
 import {
@@ -30,35 +30,37 @@ export default function GoalsScreen() {
 
   const today = new Date().toISOString().split('T')[0];
 
+  // 🔄 Fetch user-specific goals from Supabase
   const fetchGoals = async () => {
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    console.error('No authenticated user:', userError);
-    return;
-  }
+    if (userError || !user) {
+      console.error('No authenticated user:', userError);
+      return;
+    }
 
-  const { data, error } = await supabase
-    .from('daily_goals')
-    .select('*')
-    .eq('user_id', user.id) // ✅ фильтрация по текущему пользователю
-    .order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('daily_goals')
+      .select('*')
+      .eq('user_id', user.id) // ✅ filter by current authenticated user
+      .order('created_at', { ascending: false });
 
-  if (!error && data) {
-    const sorted = [...data].sort((a, b) => {
-      if (a.show_on_home === b.show_on_home) return 0;
-      return a.show_on_home ? -1 : 1;
-    });
-    setGoals(sorted);
-  } else {
-    console.error('Error fetching goals:', error);
-  }
-};
-  
-  
+    if (!error && data) {
+      // Sort so the main goal (shown on home) appears at the top
+      const sorted = [...data].sort((a, b) => {
+        if (a.show_on_home === b.show_on_home) return 0;
+        return a.show_on_home ? -1 : 1;
+      });
+      setGoals(sorted);
+    } else {
+      console.error('Error fetching goals:', error);
+    }
+  };
+
+  // ✅ Toggle goal as done or undone
   const toggleGoalStatus = async (goal: Goal) => {
     const { error } = await supabase
       .from('daily_goals')
@@ -70,6 +72,7 @@ export default function GoalsScreen() {
     }
   };
 
+  // 🌟 Set a goal as the main one to show on Home screen
   const setAsMainGoal = async (goalId: string) => {
     await supabase
       .from('daily_goals')
@@ -84,15 +87,18 @@ export default function GoalsScreen() {
     fetchGoals();
   };
 
+  // 🗑️ Delete a goal
   const deleteGoal = async (goalId: string) => {
     await supabase.from('daily_goals').delete().eq('id', goalId);
     fetchGoals();
   };
 
+  // 📆 Filter today's goals unless "Show All" is enabled
   const filteredGoals = showAll
     ? goals
     : goals.filter((g) => g.created_at.startsWith(today));
 
+  // 🔧 Goal list item renderer
   const renderItem = ({ item }: { item: Goal }) => (
     <View style={[styles.goalBox, item.is_done && styles.goalDone]}>
       <Text style={styles.goalText}>{item.title}</Text>
@@ -123,12 +129,14 @@ export default function GoalsScreen() {
     </View>
   );
 
+  // ⏳ Refresh goals when screen is focused
   useFocusEffect(
     useCallback(() => {
       fetchGoals();
     }, [])
   );
 
+  // 🧱 UI rendering
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -157,6 +165,7 @@ export default function GoalsScreen() {
             showsVerticalScrollIndicator={false}
           />
 
+          {/* Footer navigation buttons */}
           <View style={styles.footerBox}>
             <TouchableOpacity
               style={styles.footerButton}

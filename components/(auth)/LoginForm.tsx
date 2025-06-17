@@ -1,3 +1,6 @@
+// app/(auth)/login.tsx
+// Login screen for user authentication with Supabase
+
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -13,9 +16,11 @@ import {
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
 
+// Regular expression to validate email format
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export default function LoginForm() {
+  // State variables for form input and validation
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -23,6 +28,7 @@ export default function LoginForm() {
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const router = useRouter();
 
+  // Validates email with regex
   const validateEmail = (email: string) => {
     if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address');
@@ -32,6 +38,7 @@ export default function LoginForm() {
     return true;
   };
 
+  // Validates password length
   const validatePassword = (password: string) => {
     if (password.length < 6) {
       setIsPasswordValid(false);
@@ -43,6 +50,7 @@ export default function LoginForm() {
     return true;
   };
 
+  // Handles login button press
   const handleLogin = async () => {
     if (!validateEmail(email) || !validatePassword(password)) return;
 
@@ -72,6 +80,7 @@ export default function LoginForm() {
           <View style={styles.container}>
             <Text style={styles.title}>Login to WellMind</Text>
 
+            {/* Email input */}
             <TextInput
               placeholder="Email"
               value={email}
@@ -86,6 +95,7 @@ export default function LoginForm() {
             />
             {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
+            {/* Password input */}
             <TextInput
               placeholder="Password"
               value={password}
@@ -99,12 +109,17 @@ export default function LoginForm() {
             />
             {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
 
+            {/* Login button */}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
 
+            {/* Navigation to registration */}
             <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-              <Text style={styles.link}>Don't have an account? <Text style={styles.linkBold}>Register</Text></Text>
+              <Text style={styles.link}>
+                Don't have an account?{' '}
+                <Text style={styles.linkBold}>Register</Text>
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -113,6 +128,7 @@ export default function LoginForm() {
   );
 }
 
+// Stylesheet for login form
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'rgba(255,255,255,0.85)',
