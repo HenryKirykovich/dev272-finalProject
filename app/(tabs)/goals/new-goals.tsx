@@ -2,20 +2,20 @@
 // It is built using React Native and Expo, with Supabase as the backend for user authentication/
 //app/(tabs)/goals/new-goal.tsx
 
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
+  Alert,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
 
 export default function NewGoalScreen() {
@@ -23,6 +23,12 @@ export default function NewGoalScreen() {
   const router = useRouter();
 
   const handleSave = async () => {
+    // 🚫 Prevent saving empty goals
+    if (!goal.trim()) {
+      Alert.alert('Error', 'Goal cannot be empty.');
+      return;
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -41,6 +47,11 @@ export default function NewGoalScreen() {
     } else {
       router.push('/(tabs)/goals');
     }
+  };
+
+  // ⏪ Navigate back to the previous screen
+  const handleBack = () => {
+    router.back();
   };
 
   return (
@@ -80,8 +91,14 @@ export default function NewGoalScreen() {
               />
             </View>
 
+            {/* Save Button */}
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+
+            {/* Back Button */}
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+              <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -155,6 +172,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   saveButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  backButton: {
+    backgroundColor: '#b5838d',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 16,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  backButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
