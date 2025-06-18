@@ -1,11 +1,13 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../../lib/supabase';
 
 export default function MainLayout() {
   const router = useRouter();
   const [fullName, setFullName] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   // Track authentication state: null = loading, true = logged in, false = not logged in
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
@@ -25,6 +27,7 @@ export default function MainLayout() {
 
       // User is logged in
       setIsLoggedIn(true);
+      setUserId(user.id);
 
       // Fetch the user's full name for header display
       const { data, error } = await supabase
@@ -55,6 +58,54 @@ export default function MainLayout() {
     };
   }, []);
 
+  // Subscribe to real-time changes for this user's profile so the header updates immediately
+  useEffect(() => {
+    if (!userId) return;
+
+    const channel = supabase
+      .channel('users_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${userId}`,
+        },
+        payload => {
+          const newName = (payload.new as any)?.full_name;
+          if (newName && newName.trim() !== '') {
+            setFullName(newName);
+          } else {
+            setFullName(null);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
+
+  // Refresh the full name every time the (main) stack regains focus
+  useFocusEffect(
+    useCallback(() => {
+      const refreshName = async () => {
+        if (!userId) return;
+        const { data, error } = await supabase
+          .from('users')
+          .select('full_name')
+          .eq('id', userId)
+          .single();
+        if (!error && data && data.full_name && data.full_name.trim() !== '') {
+          setFullName(data.full_name);
+        }
+      };
+      refreshName();
+    }, [userId])
+  );
+
   // While auth state is loading, render nothing
   if (isLoggedIn === null) return null;
 
@@ -82,20 +133,36 @@ export default function MainLayout() {
           </TouchableOpacity>
         ),
         headerRight: () => (
-          <TouchableOpacity
-            onPress={() => router.push('/(auth)/profile-form')}
+          <View
             style={{
+              flexDirection: 'row',
+              alignItems: 'center',
               marginRight: 14,
-              paddingVertical: 6,
-              paddingHorizontal: 12,
-              backgroundColor: '#6a66a3',
-              borderRadius: 8,
             }}
           >
-            <Text style={{ color: '#fff', fontWeight: 'bold' }}>
-              {fullName ? fullName : 'Profile'}
-            </Text>
-          </TouchableOpacity>
+            {fullName && (
+              <Text
+                style={{
+                  color: '#fff',
+                  fontWeight: 'bold',
+                  marginRight: 8,
+                }}
+              >
+                {fullName}
+              </Text>
+            )}
+            <TouchableOpacity
+              onPress={() => router.push('/(auth)/profile-form')}
+              style={{
+                paddingVertical: 6,
+                paddingHorizontal: 12,
+                backgroundColor: '#6a66a3',
+                borderRadius: 8,
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Profile</Text>
+            </TouchableOpacity>
+          </View>
         ),
       }}
     />

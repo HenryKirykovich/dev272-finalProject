@@ -84,8 +84,6 @@ export default function ProfileForm() {
       Alert.alert('Error', profileError.message);
     } else {
       setProfileSuccess('✅ Profile updated successfully!');
-      setTimeout(() => setProfileSuccess(''), 4000);
-      setFullName('');
     }
   };
 
