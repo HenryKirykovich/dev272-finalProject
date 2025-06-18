@@ -1,8 +1,8 @@
 // MoodGraphScreen displays the user's mood history as a line chart.
 // It allows filtering by week, month, or all time.
 
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -43,44 +43,51 @@ export default function MoodGraphScreen() {
   const [values, setValues] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<'week' | 'month' | 'all'>('week');
-  const router = useRouter();
 
   // Fetch mood logs from Supabase for the selected date range
-  useEffect(() => {
-    const fetchMoodLogs = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+  const fetchMoodLogs = useCallback(async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
 
-      let dateFrom = new Date();
-      if (range === 'week') {
-        dateFrom.setDate(dateFrom.getDate() - 6);
-      } else if (range === 'month') {
-        dateFrom.setMonth(dateFrom.getMonth() - 1);
-      } else {
-        dateFrom = new Date('2024-01-01'); // full history fallback
-      }
+    let dateFrom = new Date();
+    if (range === 'week') {
+      dateFrom.setDate(dateFrom.getDate() - 6);
+    } else if (range === 'month') {
+      dateFrom.setMonth(dateFrom.getMonth() - 1);
+    } else {
+      dateFrom = new Date('2024-01-01'); // full history fallback
+    }
 
-      const { data, error } = await supabase
-        .from('mood_logs')
-        .select('mood, logged_at')
-        .eq('user_id', user.id)
-        .gte('logged_at', dateFrom.toISOString())
-        .order('logged_at', { ascending: true });
+    const { data, error } = await supabase
+      .from('mood_logs')
+      .select('mood, logged_at')
+      .eq('user_id', user.id)
+      .gte('logged_at', dateFrom.toISOString())
+      .order('logged_at', { ascending: true });
 
-      if (data && !error) {
-        const xLabels = data.map(entry => formatDateLabel(entry.logged_at));
-        const yValues = data.map(entry => mapMoodToValue(entry.mood));
-        setLabels(xLabels);
-        setValues(yValues);
-      }
+    if (data && !error) {
+      const xLabels = data.map(entry => formatDateLabel(entry.logged_at));
+      const yValues = data.map(entry => mapMoodToValue(entry.mood));
+      setLabels(xLabels);
+      setValues(yValues);
+    }
 
-      setLoading(false);
-    };
-
-    fetchMoodLogs();
+    setLoading(false);
   }, [range]);
+
+  // Fetch data when range changes
+  useEffect(() => {
+    fetchMoodLogs();
+  }, [range, fetchMoodLogs]);
+
+  // Refetch data each time screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchMoodLogs();
+    }, [fetchMoodLogs])
+  );
 
   // Reduce labels for wider datasets (month/all)
   const reducedLabels = labels.map((label, i, arr) => {
@@ -206,16 +213,6 @@ export default function MoodGraphScreen() {
               </View>
             </View>
           </ScrollView>
-
-          {/* Footer Navigation */}
-          <View style={styles.footerBox}>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(main)/wellmind')}
-            >
-              <Text style={styles.footerButtonText}>Home</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </ImageBackground>
     </KeyboardAvoidingView>
@@ -265,27 +262,6 @@ const styles = StyleSheet.create({
   },
   rangeButtonTextSelected: {
     color: '#fff',
-  },
-  footerBox: {
-    flexDirection: 'row',
-    backgroundColor: '#b5838d',
-    borderRadius: 20,
-    padding: 16,
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  footerButton: {
-    flex: 1,
-    backgroundColor: '#6a66a3',
-    paddingVertical: 12,
-    marginHorizontal: 6,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  footerButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
   moodLegendWrapper: {
     backgroundColor: '#ffffffcc',

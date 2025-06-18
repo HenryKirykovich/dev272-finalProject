@@ -112,6 +112,15 @@ export default function ProfileForm() {
     setTimeout(() => setPasswordSuccess(''), 4000);
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      Alert.alert('Error', 'Unable to log out');
+    } else {
+      router.replace('/(auth)/login');
+    }
+  };
+
   const handleDeleteAccount = async () => {
     Alert.alert('Are you sure?', 'This will permanently delete your account.', [
       { text: 'Cancel', style: 'cancel' },
@@ -225,10 +234,10 @@ export default function ProfileForm() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.button, { backgroundColor: '#6a66a3' }]}
-              onPress={() => router.replace('/(main)/wellmind')}
+              style={[styles.button, { backgroundColor: '#b5838d' }]}
+              onPress={handleLogout}
             >
-              <Text style={styles.buttonText}>Home Page</Text>
+              <Text style={styles.buttonText}>🚪 Logout</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

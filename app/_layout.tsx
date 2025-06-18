@@ -51,7 +51,7 @@ export default function RootLayout() {
       const inAuthGroup = first === '(auth)';
       const isAuthEntry = second === 'login' || second === 'register';
       if (inAuthGroup && isAuthEntry) {
-        router.replace('/(main)/wellmind');
+        router.replace('/(tabs)/home');
       }
     }
   }, [segments, isLoggedIn]);
@@ -60,14 +60,10 @@ export default function RootLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {!isLoggedIn && (
-        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-      )}
-      {isLoggedIn && (
-        <Stack.Screen name='(main)' options={{ headerShown: false }} />
-      )}
-      {isLoggedIn && (
+      {isLoggedIn ? (
         <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+      ) : (
+        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
       )}
     </Stack>
   );

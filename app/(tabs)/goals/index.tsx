@@ -24,9 +24,9 @@ interface Goal {
 }
 
 export default function GoalsScreen() {
+  const router = useRouter();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [showAll, setShowAll] = useState(false);
-  const router = useRouter();
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -101,30 +101,36 @@ export default function GoalsScreen() {
   // 🔧 Goal list item renderer
   const renderItem = ({ item }: { item: Goal }) => (
     <View style={[styles.goalBox, item.is_done && styles.goalDone]}>
-      <Text style={styles.goalText}>{item.title}</Text>
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={[styles.statusButton, item.is_done && styles.statusDone]}
-          onPress={() => toggleGoalStatus(item)}
-        >
-          <Text style={styles.statusButtonText}>
-            {item.is_done ? 'Undo' : 'Done'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.mainButton}
-          onPress={() => setAsMainGoal(item.id)}
-        >
-          <Text style={styles.statusButtonText}>
-            {item.show_on_home ? '✔ Main' : 'Show on Home'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => deleteGoal(item.id)}
-        >
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
+      {/* Wrapper to align text width with button row width */}
+      <View>
+        <View style={styles.goalTextContainer}>
+          <Text style={styles.goalText}>{item.title}</Text>
+        </View>
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={[styles.statusButton, item.is_done && styles.statusDone]}
+            onPress={() => toggleGoalStatus(item)}
+          >
+            <Text style={styles.statusButtonText}>
+              {item.is_done ? 'Undo' : 'Done'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.mainButton}
+            onPress={() => setAsMainGoal(item.id)}
+          >
+            <Text style={styles.statusButtonText}>
+              {item.show_on_home ? '✔ Main' : 'Show on Home'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => deleteGoal(item.id)}
+          >
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -148,38 +154,57 @@ export default function GoalsScreen() {
         resizeMode='cover'
       >
         <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Daily Goals</Text>
-            <TouchableOpacity onPress={() => setShowAll(!showAll)}>
-              <Text style={styles.toggleText}>
-                {showAll ? 'Show Today Only' : 'Show All Goals'}
+          {/* Enhanced Header Section */}
+          <View style={styles.headerSection}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleEmoji}>🎯</Text>
+              <Text style={styles.title}>Daily Goals</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.toggleButton}
+              onPress={() => setShowAll(!showAll)}
+            >
+              <Text style={styles.toggleButtonText}>
+                {showAll ? '📅 Today Only' : '🗂️ Show All'}
               </Text>
             </TouchableOpacity>
           </View>
 
-          <FlatList
-            data={filteredGoals}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            showsVerticalScrollIndicator={false}
-          />
-
-          {/* Footer navigation buttons */}
-          <View style={styles.footerBox}>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(main)/wellmind')}
-            >
-              <Text style={styles.footerButtonText}>Home</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(tabs)/goals/new-goals')}
-            >
-              <Text style={styles.footerButtonText}>＋</Text>
-            </TouchableOpacity>
+          {/* Goals Content - takes remaining space */}
+          <View style={styles.contentSection}>
+            {filteredGoals.length === 0 ? (
+              <View style={styles.emptyStateContainer}>
+                <Text style={styles.emptyStateText}>
+                  {showAll ? 'No goals yet' : 'No goals for today'}
+                </Text>
+                <Text style={styles.emptyStateSubtext}>
+                  {showAll
+                    ? 'Tap the + button to create your first goal'
+                    : 'Tap the + button to add a goal for today'}
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredGoals}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={[
+                  styles.listContentContainer,
+                  filteredGoals.length <= 5 && styles.centeredListContent,
+                ]}
+                showsVerticalScrollIndicator={false}
+                style={styles.goalsList}
+              />
+            )}
           </View>
+
+          {/* Floating plus button */}
+          <TouchableOpacity
+            style={styles.floatingAddButton}
+            onPress={() => router.push('/(tabs)/goals/new-goals' as any)}
+          >
+            <Text style={styles.addButtonText}>＋</Text>
+          </TouchableOpacity>
         </View>
       </ImageBackground>
     </KeyboardAvoidingView>
@@ -192,35 +217,56 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
-  },
-  header: {
-    marginBottom: 20,
-    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#2d1b69',
     marginBottom: 8,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(106, 102, 163, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
-  toggleText: {
+  toggleButton: {
+    backgroundColor: '#6a66a3',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+    shadowColor: '#6a66a3',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  toggleButtonText: {
+    color: '#fff',
+    fontWeight: '700',
     fontSize: 14,
-    color: '#6a4c93',
-    textDecorationLine: 'underline',
   },
   goalBox: {
     backgroundColor: '#f2e9f4',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+  },
+  goalTextContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 12,
+    alignSelf: 'stretch',
   },
   goalText: {
     fontSize: 16,
     color: '#333',
-    marginBottom: 8,
+    textAlign: 'center',
+    fontWeight: '500',
   },
   goalDone: {
     backgroundColor: '#c5e1a5',
@@ -230,7 +276,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
-    alignSelf: 'flex-start',
     marginRight: 10,
   },
   mainButton: {
@@ -238,7 +283,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
-    alignSelf: 'flex-start',
   },
   statusDone: {
     backgroundColor: '#a67db8',
@@ -252,34 +296,93 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
-    alignSelf: 'flex-start',
     marginLeft: 10,
   },
   deleteButtonText: {
     color: '#fff',
     fontWeight: 'bold',
   },
-  footerBox: {
-    flexDirection: 'row',
-    backgroundColor: '#b5838d',
-    borderRadius: 20,
-    padding: 16,
-    justifyContent: 'space-between',
-  },
-  footerButton: {
-    flex: 1,
-    backgroundColor: '#6a66a3',
-    paddingVertical: 12,
-    marginHorizontal: 6,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  footerButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
   buttonRow: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  addButton: {
+    backgroundColor: '#6a66a3',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  emptyStateText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#666',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyStateSubtext: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    maxWidth: 250,
+  },
+  floatingAddButton: {
+    position: 'absolute',
+    bottom: 90,
+    alignSelf: 'center',
+    backgroundColor: '#6a66a3',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contentWrapper: {
+    flex: 1,
+  },
+  goalsList: {
+    flex: 1,
+  },
+  listContentContainer: {
+    paddingBottom: 20,
+  },
+  centeredListContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  headerSection: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    shadowColor: '#6a66a3',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    marginBottom: 20,
+  },
+  contentSection: {
+    flex: 1,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  titleEmoji: {
+    fontSize: 28,
+    marginRight: 10,
   },
 });

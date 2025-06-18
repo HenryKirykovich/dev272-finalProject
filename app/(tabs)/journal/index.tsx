@@ -100,10 +100,8 @@ export default function JournalScreen() {
       >
         <View style={styles.container}>
           {/* Header */}
-          <View style={styles.textBgWrapper}>
-            <View style={styles.textBgContent}>
-              <Text style={styles.title}>My Journal</Text>
-            </View>
+          <View style={styles.headerRow}>
+            <Text style={styles.title}>My Journal</Text>
           </View>
 
           {/* List of entries */}
@@ -115,21 +113,13 @@ export default function JournalScreen() {
             showsVerticalScrollIndicator={false}
           />
 
-          {/* Footer with navigation buttons */}
-          <View style={styles.footerBox}>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(main)/wellmind')}
-            >
-              <Text style={styles.footerButtonText}>Home</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(tabs)/journal/new-entry')}
-            >
-              <Text style={styles.footerButtonText}>＋</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Floating plus button */}
+          <TouchableOpacity
+            style={styles.floatingAddButton}
+            onPress={() => router.push('/(tabs)/journal/new-entry' as any)}
+          >
+            <Text style={styles.addButtonText}>＋</Text>
+          </TouchableOpacity>
         </View>
       </ImageBackground>
     </KeyboardAvoidingView>
@@ -146,20 +136,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 20,
   },
-  textBgWrapper: {
-    position: 'relative',
-    marginBottom: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
-    minHeight: 120,
-    justifyContent: 'center',
-    width: '100%',
-  },
-  textBgContent: {
+  headerRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    zIndex: 1,
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   title: {
     fontSize: 28,
@@ -182,24 +163,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  footerBox: {
-    flexDirection: 'row',
-    backgroundColor: '#b5838d',
-    borderRadius: 20,
-    padding: 16,
-    justifyContent: 'space-between',
-  },
-  footerButton: {
-    flex: 1,
-    backgroundColor: '#6a66a3',
-    paddingVertical: 12,
-    marginHorizontal: 6,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  footerButtonText: {
+  addButtonText: {
     color: '#fff',
+    fontSize: 22,
     fontWeight: 'bold',
-    fontSize: 16,
+  },
+  floatingAddButton: {
+    position: 'absolute',
+    bottom: 90 /* above tab bar */,
+    alignSelf: 'center',
+    backgroundColor: '#6a66a3',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

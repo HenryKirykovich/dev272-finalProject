@@ -44,13 +44,13 @@ export default function NewEntryScreen() {
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      router.push('/(tabs)/journal');
+      router.push('/journal' as any);
     }
   };
 
   // ⏪ Navigate back to the previous screen
   const handleBack = () => {
-    router.push('/(tabs)/journal');
+    router.push('/journal' as any);
   };
 
   return (
