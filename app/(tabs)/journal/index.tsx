@@ -83,10 +83,16 @@ export default function JournalScreen() {
 
   // 📝 Render each journal entry
   const renderItem = ({ item }: { item: Entry }) => (
-    <View style={styles.entryBox}>
+    <TouchableOpacity
+      style={styles.entryBox}
+      onPress={() =>
+        router.push(`/(tabs)/journal/edit-entry?id=${item.id}` as any)
+      }
+      activeOpacity={0.7}
+    >
       <Text style={styles.entryDate}>{formatDate(item.created_at)}</Text>
       <Text style={styles.entryText}>{item.content}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   // 🧱 UI Layout

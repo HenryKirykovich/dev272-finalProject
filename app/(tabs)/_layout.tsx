@@ -66,6 +66,7 @@ export default function TabsLayout() {
       {/* Hide nested creation screens from the tab bar */}
       <Tabs.Screen name='journal/new-entry' options={{ href: null }} />
       <Tabs.Screen name='goals/new-goals' options={{ href: null }} />
+      <Tabs.Screen name='journal/edit-entry' options={{ href: null }} />
       <Tabs.Screen
         name='profile'
         options={{
