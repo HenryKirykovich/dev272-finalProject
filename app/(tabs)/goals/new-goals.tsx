@@ -51,7 +51,7 @@ export default function NewGoalScreen() {
 
   // ⏪ Navigate back to the previous screen
   const handleBack = () => {
-    router.back();
+    router.push('/(tabs)/goals');
   };
 
   return (

@@ -50,7 +50,7 @@ export default function NewEntryScreen() {
 
   // ⏪ Navigate back to the previous screen
   const handleBack = () => {
-    router.back();
+    router.push('/(tabs)/journal');
   };
 
   return (
