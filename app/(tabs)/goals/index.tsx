@@ -7,6 +7,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
@@ -145,70 +146,72 @@ export default function GoalsScreen() {
 
   // 🧱 UI rendering
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={[styles.container, { backgroundColor }]}>
-        {/* Enhanced Header Section */}
-        <View style={styles.headerSection}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleEmoji}>🎯</Text>
-            <Text style={styles.title}>Daily Goals</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={[styles.container, { backgroundColor }]}>
+          {/* Enhanced Header Section */}
+          <View style={styles.headerSection}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleEmoji}>🎯</Text>
+              <Text style={styles.title}>Daily Goals</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.toggleButton}
+              onPress={() => setShowAll(!showAll)}
+            >
+              <Text style={styles.toggleButtonText}>
+                {showAll ? '📅 Today Only' : '🗂️ Show All'}
+              </Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.toggleButton}
-            onPress={() => setShowAll(!showAll)}
+
+          {/* Goals Content - takes remaining space */}
+          <View
+            style={[
+              styles.contentSection,
+              filteredGoals.length === 0 && {
+                justifyContent: 'center',
+                flexGrow: 1,
+              },
+            ]}
           >
-            <Text style={styles.toggleButtonText}>
-              {showAll ? '📅 Today Only' : '🗂️ Show All'}
-            </Text>
+            {filteredGoals.length === 0 ? (
+              <View style={styles.emptyStateContainer}>
+                <View style={styles.emptyStateBox}>
+                  <Text style={styles.emptyStateText}>
+                    {showAll ? 'No goals yet' : 'No goals for today'}
+                  </Text>
+                  <Text style={styles.emptyStateSubtext}>
+                    {showAll
+                      ? 'Tap the + button to create your first goal'
+                      : 'Tap the + button to add a goal for today'}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredGoals}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.listContentContainer}
+                showsVerticalScrollIndicator={false}
+                style={styles.goalsList}
+              />
+            )}
+          </View>
+
+          {/* Floating plus button */}
+          <TouchableOpacity
+            style={styles.floatingAddButton}
+            onPress={() => router.push('/(tabs)/goals/new-goals' as any)}
+          >
+            <Text style={styles.addButtonText}>＋</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Goals Content - takes remaining space */}
-        <View
-          style={[
-            styles.contentSection,
-            filteredGoals.length === 0 && {
-              justifyContent: 'center',
-              flexGrow: 1,
-            },
-          ]}
-        >
-          {filteredGoals.length === 0 ? (
-            <View style={styles.emptyStateContainer}>
-              <View style={styles.emptyStateBox}>
-                <Text style={styles.emptyStateText}>
-                  {showAll ? 'No goals yet' : 'No goals for today'}
-                </Text>
-                <Text style={styles.emptyStateSubtext}>
-                  {showAll
-                    ? 'Tap the + button to create your first goal'
-                    : 'Tap the + button to add a goal for today'}
-                </Text>
-              </View>
-            </View>
-          ) : (
-            <FlatList
-              data={filteredGoals}
-              renderItem={renderItem}
-              keyExtractor={item => item.id}
-              contentContainerStyle={styles.listContentContainer}
-              showsVerticalScrollIndicator={false}
-              style={styles.goalsList}
-            />
-          )}
-        </View>
-
-        {/* Floating plus button */}
-        <TouchableOpacity
-          style={styles.floatingAddButton}
-          onPress={() => router.push('/(tabs)/goals/new-goals' as any)}
-        >
-          <Text style={styles.addButtonText}>＋</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

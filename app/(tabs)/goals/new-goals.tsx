@@ -8,6 +8,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -56,51 +57,53 @@ export default function NewGoalScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}
-    >
-      <View style={[styles.container, { backgroundColor }]}>
-        {/* Enhanced Header Section */}
-        <View style={styles.headerSection}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleEmoji}>✨</Text>
-            <Text style={styles.title}>New Goal</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}
+      >
+        <View style={[styles.container, { backgroundColor }]}>
+          {/* Enhanced Header Section */}
+          <View style={styles.headerSection}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleEmoji}>✨</Text>
+              <Text style={styles.title}>New Goal</Text>
+            </View>
+            <Text style={styles.subtitle}>Describe your goal for today</Text>
           </View>
-          <Text style={styles.subtitle}>Describe your goal for today</Text>
+
+          {/* Content Section */}
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps='handled'
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Input Container */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={goal}
+                onChangeText={setGoal}
+                placeholder='Type your goal here...'
+                placeholderTextColor='rgba(255, 255, 255, 0.7)'
+                style={styles.input}
+                multiline
+              />
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                <Text style={styles.saveButtonText}>💾 Save Goal</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+                <Text style={styles.backButtonText}>← Back</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
         </View>
-
-        {/* Content Section */}
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps='handled'
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Input Container */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              value={goal}
-              onChangeText={setGoal}
-              placeholder='Type your goal here...'
-              placeholderTextColor='rgba(255, 255, 255, 0.7)'
-              style={styles.input}
-              multiline
-            />
-          </View>
-
-          {/* Action Buttons */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>💾 Save Goal</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-              <Text style={styles.backButtonText}>← Back</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

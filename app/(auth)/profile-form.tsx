@@ -4,6 +4,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -127,111 +128,117 @@ export default function ProfileForm() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.keyboardAvoidingView, { backgroundColor }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-      <ScrollView
-        contentContainerStyle={[styles.scrollContainer, { backgroundColor }]}
-        keyboardShouldPersistTaps='handled'
-        style={{ backgroundColor }}
+    <SafeAreaView style={{ flex: 1, backgroundColor }}>
+      <KeyboardAvoidingView
+        style={[styles.keyboardAvoidingView, { backgroundColor }]}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        <View style={[styles.container]}>
-          <View style={styles.headerSection}>
-            <WellMindLogo width={120} height={120} style={styles.logo} />
-            <Text style={styles.title}>Account Settings</Text>
-            <Text style={styles.subtitle}>
-              Manage your profile and security
-            </Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={[styles.scrollContainer, { backgroundColor }]}
+          keyboardShouldPersistTaps='handled'
+          style={{ backgroundColor }}
+        >
+          <View style={[styles.container]}>
+            <View style={styles.headerSection}>
+              <WellMindLogo width={120} height={120} style={styles.logo} />
+              <Text style={styles.title}>Account Settings</Text>
+              <Text style={styles.subtitle}>
+                Manage your profile and security
+              </Text>
+            </View>
 
-          <View style={styles.formSection}>
-            <TextInput
-              style={styles.input}
-              placeholder='Full Name'
-              placeholderTextColor='#999'
-              onChangeText={setFullName}
-              value={fullName}
-              autoCapitalize='words'
-              autoComplete='name'
-            />
-            <TouchableOpacity style={styles.button} onPress={handleSaveProfile}>
-              <Text style={styles.buttonText}>Save Profile</Text>
-            </TouchableOpacity>
-            {profileSuccess ? (
-              <Text style={styles.successText}>{profileSuccess}</Text>
-            ) : null}
-          </View>
+            <View style={styles.formSection}>
+              <TextInput
+                style={styles.input}
+                placeholder='Full Name'
+                placeholderTextColor='#999'
+                onChangeText={setFullName}
+                value={fullName}
+                autoCapitalize='words'
+                autoComplete='name'
+              />
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleSaveProfile}
+              >
+                <Text style={styles.buttonText}>Save Profile</Text>
+              </TouchableOpacity>
+              {profileSuccess ? (
+                <Text style={styles.successText}>{profileSuccess}</Text>
+              ) : null}
+            </View>
 
-          <View style={styles.divider} />
+            <View style={styles.divider} />
 
-          <View style={styles.formSection}>
-            <TextInput
-              style={styles.input}
-              placeholder='New Password (min 6 characters)'
-              placeholderTextColor='#999'
-              secureTextEntry
-              onChangeText={setNewPassword}
-              value={newPassword}
-            />
-            {passwordError ? (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            ) : null}
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleChangePassword}
-            >
-              <Text style={styles.buttonText}>Change Password</Text>
-            </TouchableOpacity>
-            {passwordSuccess ? (
-              <Text style={styles.successText}>{passwordSuccess}</Text>
-            ) : null}
-          </View>
+            <View style={styles.formSection}>
+              <TextInput
+                style={styles.input}
+                placeholder='New Password (min 6 characters)'
+                placeholderTextColor='#999'
+                secureTextEntry
+                onChangeText={setNewPassword}
+                value={newPassword}
+              />
+              {passwordError ? (
+                <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleChangePassword}
+              >
+                <Text style={styles.buttonText}>Change Password</Text>
+              </TouchableOpacity>
+              {passwordSuccess ? (
+                <Text style={styles.successText}>{passwordSuccess}</Text>
+              ) : null}
+            </View>
 
-          <View style={styles.divider} />
+            <View style={styles.divider} />
 
-          <View style={styles.formSection}>
-            <Text style={styles.subtitle}>Change Background Color</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-                marginVertical: 10,
-              }}
-            >
-              {BG_COLORS.map(color => (
-                <TouchableOpacity
-                  key={color}
-                  style={{
-                    backgroundColor: color,
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    borderWidth: color === backgroundColor ? 3 : 1,
-                    borderColor: color === backgroundColor ? '#007BFF' : '#ddd',
-                  }}
-                  onPress={() => {
-                    console.log(`Setting background color to: ${color}`);
-                    setBackgroundColor(color);
-                  }}
-                />
-              ))}
+            <View style={styles.formSection}>
+              <Text style={styles.subtitle}>Change Background Color</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  marginVertical: 10,
+                }}
+              >
+                {BG_COLORS.map(color => (
+                  <TouchableOpacity
+                    key={color}
+                    style={{
+                      backgroundColor: color,
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      borderWidth: color === backgroundColor ? 3 : 1,
+                      borderColor:
+                        color === backgroundColor ? '#007BFF' : '#ddd',
+                    }}
+                    onPress={() => {
+                      console.log(`Setting background color to: ${color}`);
+                      setBackgroundColor(color);
+                    }}
+                  />
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.actionSection}>
+              <TouchableOpacity
+                style={[styles.button, styles.logoutButton]}
+                onPress={handleLogout}
+              >
+                <Text style={styles.buttonText}>🚪 Logout</Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.actionSection}>
-            <TouchableOpacity
-              style={[styles.button, styles.logoutButton]}
-              onPress={handleLogout}
-            >
-              <Text style={styles.buttonText}>🚪 Logout</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
