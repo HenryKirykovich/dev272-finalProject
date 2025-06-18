@@ -27,7 +27,12 @@ export default function ProfileForm() {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
-      if (userError || !user) return;
+
+      // If not authenticated, redirect to login page
+      if (!user || userError) {
+        router.replace('/(auth)/login');
+        return;
+      }
 
       const { data } = await supabase
         .from('users')

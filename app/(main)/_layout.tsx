@@ -1,19 +1,32 @@
-import { Stack } from 'expo-router';
-import { TouchableOpacity, Text } from 'react-native';
-import { useRouter } from 'expo-router';
-import { supabase } from '../../lib/supabase';
+import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { Text, TouchableOpacity } from 'react-native';
+import { supabase } from '../../lib/supabase';
 
 export default function MainLayout() {
   const router = useRouter();
   const [fullName, setFullName] = useState<string | null>(null);
+  // Track authentication state: null = loading, true = logged in, false = not logged in
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const fetchFullName = async () => {
+    const checkAuthAndFetch = async () => {
+      // Check current authentication status
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+
+      // If no user is found, redirect to login page
+      if (!user) {
+        setIsLoggedIn(false);
+        router.replace('/(auth)/login');
+        return;
+      }
+
+      // User is logged in
+      setIsLoggedIn(true);
+
+      // Fetch the user's full name for header display
       const { data, error } = await supabase
         .from('users')
         .select('full_name')
@@ -25,8 +38,25 @@ export default function MainLayout() {
         setFullName(null);
       }
     };
-    fetchFullName();
+
+    checkAuthAndFetch();
+
+    // Listen for auth state changes (e.g., sign-out from another tab)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session?.user) {
+        router.replace('/(auth)/login');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+
+  // While auth state is loading, render nothing
+  if (isLoggedIn === null) return null;
 
   return (
     <Stack

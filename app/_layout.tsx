@@ -1,9 +1,9 @@
-import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { ActivityIndicator, Alert } from 'react-native';
-import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert } from 'react-native';
+import { supabase } from '../lib/supabase';
 
 export const unstable_settings = {
   showDebugInfo: false,
@@ -11,6 +11,8 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const router = useRouter();
+  const segments = useSegments();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -31,6 +33,23 @@ export default function RootLayout() {
 
     return () => subscription.remove();
   }, []);
+
+  // Guard: if not logged in and navigating outside login/register, redirect to login
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      const first = segments[0];
+      const second = segments[1];
+
+      // Allowed unauth routes: /(auth)/login or /(auth)/register
+      const inAuthGroup = first === '(auth)';
+      const isAllowedAuthScreen =
+        inAuthGroup && (second === 'login' || second === 'register');
+
+      if (!isAllowedAuthScreen) {
+        router.replace('/(auth)/login');
+      }
+    }
+  }, [segments, isLoggedIn]);
 
   if (isLoggedIn === null) return <ActivityIndicator style={{ flex: 1 }} />;
 
