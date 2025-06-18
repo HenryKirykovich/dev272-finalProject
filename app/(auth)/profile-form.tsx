@@ -28,8 +28,6 @@ export default function ProfileForm() {
   const router = useRouter();
   const { backgroundColor, setBackgroundColor } = useBackgroundColor();
 
-  console.log('Profile form backgroundColor:', backgroundColor);
-
   useEffect(() => {
     const fetchProfile = async () => {
       const {
