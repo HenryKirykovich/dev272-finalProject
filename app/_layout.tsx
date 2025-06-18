@@ -1,8 +1,6 @@
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { supabase } from '../lib/supabase';
 
 export const unstable_settings = {
@@ -19,18 +17,6 @@ export default function RootLayout() {
       setIsLoggedIn(!!user);
     });
 
-    registerForPushNotificationsAsync().then(token => {
-      console.log('Expo push token:', token);
-      // 💡 Optionally save to Supabase here
-    });
-
-    // Optional: handle notification received while app is in foreground
-    const notificationSub = Notifications.addNotificationReceivedListener(
-      notification => {
-        console.log('Notification Received:', notification);
-      }
-    );
-
     // Listen to future auth state changes to keep login status accurate
     const {
       data: { subscription: authSub },
@@ -39,7 +25,6 @@ export default function RootLayout() {
     });
 
     return () => {
-      notificationSub.remove();
       authSub.unsubscribe();
     };
   }, []);
@@ -83,28 +68,4 @@ export default function RootLayout() {
       )}
     </Stack>
   );
-}
-
-// 📦 Helper: register device for push notifications
-async function registerForPushNotificationsAsync() {
-  if (!Device.isDevice) {
-    Alert.alert('Must use physical device for Push Notifications');
-    return null;
-  }
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') {
-    Alert.alert('Failed to get push token for push notification!');
-    return null;
-  }
-
-  const token = (await Notifications.getExpoPushTokenAsync()).data;
-  return token;
 }
