@@ -13,7 +13,7 @@ import {
     View,
 } from 'react-native';
 
-import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
+import WellMindLogo from '../../assets/images/WellMind.svg';
 import { supabase } from '../../lib/supabase';
 import { useBackgroundColor } from '../_layout';
 import { homeScreenStyles as styles } from './home.styles';

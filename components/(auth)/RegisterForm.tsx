@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { useBackgroundColor } from '../../app/_layout';
-import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
+import WellMindLogo from '../../assets/images/WellMind.svg';
 import { supabase } from '../../lib/supabase';
 import { authStyles as styles } from './auth.styles';
 
