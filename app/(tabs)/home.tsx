@@ -2,13 +2,13 @@
 // app/(tabs)/home.tsx
 // Home screen (WellMind) inside tabs navigator
 
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import {
     ImageBackground,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -16,6 +16,7 @@ import {
 
 import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
+import { homeScreenStyles as styles } from './home.styles';
 
 export default function HomeScreen() {
     const [selectedMood, setSelectedMood] = useState('');
@@ -24,51 +25,51 @@ export default function HomeScreen() {
     const today = new Date().toISOString().split('T')[0];
     const todayISO = new Date(today).toISOString();
 
-    useEffect(() => {
+    const loadData = useCallback(() => {
         loadTodayMood();
         loadMainGoal();
     }, []);
 
+    useFocusEffect(
+        useCallback(() => {
+            loadData();
+        }, [loadData])
+    );
+
     const loadTodayMood = async () => {
         const {
             data: { user },
-            error,
         } = await supabase.auth.getUser();
 
-        if (error || !user) return;
+        if (!user) return;
 
         const { data } = await supabase
             .from('mood_logs')
             .select('mood')
-            .eq('logged_at', todayISO)
             .eq('user_id', user.id)
+            .eq('logged_at', todayISO)
             .single();
 
-        if (data?.mood) {
-            setSelectedMood(data.mood);
-        }
+        setSelectedMood(data?.mood || '');
     };
 
     const loadMainGoal = async () => {
         const {
             data: { user },
-            error,
         } = await supabase.auth.getUser();
 
-        if (error || !user) return;
+        if (!user) return;
 
         const { data } = await supabase
             .from('daily_goals')
             .select('title')
-            .eq('show_on_home', true)
             .eq('user_id', user.id)
+            .eq('show_on_home', true)
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
 
-        if (data) {
-            setMainGoal(data.title);
-        }
+        setMainGoal(data?.title || null);
     };
 
     const handleMoodSelect = async (mood: string) => {
@@ -76,20 +77,22 @@ export default function HomeScreen() {
 
         const {
             data: { user },
-            error,
         } = await supabase.auth.getUser();
 
-        if (error || !user) return;
+        if (!user) return;
 
         const { data: existing } = await supabase
             .from('mood_logs')
             .select('id')
-            .eq('logged_at', todayISO)
             .eq('user_id', user.id)
+            .eq('logged_at', todayISO)
             .single();
 
         if (existing?.id) {
-            await supabase.from('mood_logs').update({ mood }).eq('id', existing.id);
+            await supabase
+                .from('mood_logs')
+                .update({ mood })
+                .eq('id', existing.id);
         } else {
             await supabase.from('mood_logs').insert({
                 mood,
@@ -100,8 +103,8 @@ export default function HomeScreen() {
     };
 
     const moodDescription: Record<string, string> = {
-        '😐': 'Feeling neutral',
         '🙂': 'Feeling happy',
+        '😐': 'Feeling neutral',
         '😔': 'Feeling sad',
     };
 
@@ -115,84 +118,56 @@ export default function HomeScreen() {
                 style={styles.background}
                 resizeMode='cover'
             >
-                <View style={styles.container}>
-                    <ScrollView
-                        contentContainerStyle={styles.scrollContent}
-                        keyboardShouldPersistTaps='handled'
-                        showsVerticalScrollIndicator={false}
-                    >
-                        {/* HEADER */}
+                <ScrollView
+                    contentContainerStyle={styles.container}
+                    keyboardShouldPersistTaps='handled'
+                    showsVerticalScrollIndicator={false}
+                >
+                    {/* HEADER */}
+                    <View style={styles.headerSection}>
                         <View style={styles.logoWrapper}>
                             <WellMindLogo width={140} height={140} />
                             <Text style={styles.title}>WellMind</Text>
                             <Text style={styles.subtitle}>Your mental wellness center</Text>
                         </View>
+                    </View>
 
+                    <View style={styles.contentSection}>
                         {mainGoal && (
                             <View style={styles.goalBox}>
                                 <Text style={styles.goalText}>🎯 Today's Goal: {mainGoal}</Text>
                             </View>
                         )}
 
-                        <Text style={styles.moodPrompt}>How are you feeling today?</Text>
-                        <View style={styles.emojiRow}>
-                            {['😐', '🙂', '😔'].map(emoji => (
-                                <TouchableOpacity
-                                    key={emoji}
-                                    onPress={() => handleMoodSelect(emoji)}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.emoji,
-                                            selectedMood === emoji && styles.emojiSelected,
-                                        ]}
+                        <View style={styles.moodSection}>
+                            <Text style={styles.moodPrompt}>How are you feeling today?</Text>
+                            <View style={styles.emojiRow}>
+                                {['🙂', '😐', '😔'].map(emoji => (
+                                    <TouchableOpacity
+                                        key={emoji}
+                                        onPress={() => handleMoodSelect(emoji)}
                                     >
-                                        {emoji}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                                        <Text
+                                            style={[
+                                                styles.emoji,
+                                                selectedMood === emoji && styles.emojiSelected,
+                                            ]}
+                                        >
+                                            {emoji}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
 
-                        {selectedMood && (
-                            <Text style={styles.moodLabel}>
-                                {moodDescription[selectedMood]}
-                            </Text>
-                        )}
-                    </ScrollView>
-                </View>
+                            {selectedMood && (
+                                <Text style={styles.moodLabel}>
+                                    {moodDescription[selectedMood]}
+                                </Text>
+                            )}
+                        </View>
+                    </View>
+                </ScrollView>
             </ImageBackground>
         </KeyboardAvoidingView>
     );
 }
-
-const styles = StyleSheet.create({
-    background: { flex: 1 },
-    container: { flex: 1, justifyContent: 'space-between', padding: 20 },
-    scrollContent: { flexGrow: 1, alignItems: 'center' },
-    logoWrapper: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 24,
-        width: '100%',
-    },
-    title: { fontSize: 36, fontWeight: 'bold', color: '#000' },
-    subtitle: { fontSize: 16, color: '#000' },
-    goalBox: {
-        backgroundColor: '#ffffffcc',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderRadius: 16,
-        marginBottom: 20,
-        width: '100%',
-    },
-    goalText: { fontSize: 18, color: '#333', fontWeight: 'bold' },
-    moodPrompt: { fontSize: 20, color: '#000', marginBottom: 10 },
-    emojiRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '60%',
-    },
-    emoji: { fontSize: 40 },
-    emojiSelected: { transform: [{ scale: 1.2 }] },
-    moodLabel: { fontSize: 16, color: '#333', marginTop: 10 },
-});
