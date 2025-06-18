@@ -188,10 +188,7 @@ export default function GoalsScreen() {
                 data={filteredGoals}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
-                contentContainerStyle={[
-                  styles.listContentContainer,
-                  filteredGoals.length <= 5 && styles.centeredListContent,
-                ]}
+                contentContainerStyle={styles.listContentContainer}
                 showsVerticalScrollIndicator={false}
                 style={styles.goalsList}
               />
