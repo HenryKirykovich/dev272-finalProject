@@ -4,35 +4,41 @@
     "slug": "WellMind",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/velvet3.png",
+    "icon": "./assets/images/WellMind.png",
     "scheme": "wellmind",
     "userInterfaceStyle": "automatic",
+    "primaryColor": "#F48FB1",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/velvet3.png",
+        "foregroundImage": "./assets/images/WellMind.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": false
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/velvet3.png"
+      "favicon": "./assets/images/WellMind.png"
     },
     "router": {
       "devTools": false
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "sitemap": false
+        }
+      ],
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/velvet3.png",
-          "imageWidth": 200,
+          "image": "./assets/images/WellMind.png",
+          "imageWidth": 512,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }

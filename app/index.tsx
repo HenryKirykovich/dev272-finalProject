@@ -1,8 +1,8 @@
 // app/index.tsx
 // This is the entry point of the app. It redirects the user based on authentication status.
 
-import { useEffect, useState } from 'react';
 import { Redirect } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function Index() {
@@ -22,5 +22,5 @@ export default function Index() {
   // Redirect based on login status:
   // - If logged in, go to main app screen
   // - If not, go to login screen
-  return <Redirect href={isLoggedIn ? '/(main)/wellmind' : '/(auth)/login'} />;
+  return <Redirect href={isLoggedIn ? '/(tabs)/home' : '/(auth)/login'} />;
 }

@@ -2,19 +2,20 @@
 // Login screen for user authentication with Supabase
 
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useBackgroundColor } from '../../app/_layout';
+import WellMindLogo from '../../assets/images/WellMind.svg';
 import { supabase } from '../../lib/supabase';
+import { authStyles as styles } from './auth.styles';
 
 // Regular expression to validate email format
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -26,6 +27,16 @@ export default function LoginForm() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const router = useRouter();
+  const { backgroundColor } = useBackgroundColor();
+
+  // Redirect already authenticated users to main page
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        router.replace('/(tabs)/home');
+      }
+    });
+  }, []);
 
   // Validates email with regex
   const validateEmail = (email: string) => {
@@ -37,19 +48,15 @@ export default function LoginForm() {
     return true;
   };
 
-  // Validates password length
-  const validatePassword = (password: string) => {
-    if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters long');
-      return false;
-    }
-    setPasswordError('');
-    return true;
-  };
-
   // Handles login button press
   const handleLogin = async () => {
-    if (!validateEmail(email) || !validatePassword(password)) return;
+    if (!validateEmail(email) || password.length < 6) {
+      if (password.length < 6) {
+        setPasswordError('Password must be at least 6 characters');
+      }
+      return;
+    }
+    setPasswordError('');
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -58,124 +65,87 @@ export default function LoginForm() {
     if (error) {
       setPasswordError(error.message);
     } else {
-      router.replace('/(main)/wellmind');
+      router.replace('/(tabs)/home');
     }
   };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={80}
+      style={[styles.keyboardAvoidingView, { backgroundColor }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-      <ImageBackground
-        source={require('../../assets/images/velvet.jpg')}
-        style={{ flex: 1 }}
-        resizeMode='cover'
+      <ScrollView
+        contentContainerStyle={[styles.scrollContainer, { backgroundColor }]}
+        keyboardShouldPersistTaps='handled'
+        style={{ backgroundColor }}
       >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-          keyboardShouldPersistTaps='handled'
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: 'rgba(255, 255, 255, 0.8)' },
+          ]}
         >
-          <View style={styles.container}>
-            <Text style={styles.title}>Login to WellMind</Text>
-
-            {/* Email input */}
-            <TextInput
-              placeholder='Email'
-              value={email}
-              onChangeText={text => {
-                setEmail(text);
-                validateEmail(text);
-              }}
-              autoCapitalize='none'
-              keyboardType='email-address'
-              style={styles.input}
-              placeholderTextColor='#000'
-            />
-            {emailError && <Text style={styles.errorText}>{emailError}</Text>}
-
-            {/* Password input */}
-            <TextInput
-              placeholder='Password'
-              value={password}
-              onChangeText={text => {
-                setPassword(text);
-                validatePassword(text);
-              }}
-              secureTextEntry
-              style={styles.input}
-              placeholderTextColor='#000'
-            />
-            {passwordError && (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            )}
-
-            {/* Login button */}
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-
-            {/* Navigation to registration */}
-            <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-              <Text style={styles.link}>
-                Don&apos;t have an account?{' '}
-                <Text style={styles.linkBold}>Register</Text>
-              </Text>
-            </TouchableOpacity>
+          <View style={styles.headerSection}>
+            <WellMindLogo width={100} height={100} style={styles.logo} />
+            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.subtitle}>Login to your WellMind account</Text>
           </View>
-        </ScrollView>
-      </ImageBackground>
+
+          {/* Email input */}
+          <TextInput
+            placeholder='Email'
+            value={email}
+            onChangeText={text => {
+              setEmail(text.trim());
+              validateEmail(text.trim());
+            }}
+            autoCapitalize='none'
+            keyboardType='email-address'
+            style={styles.input}
+            placeholderTextColor='#999'
+          />
+          {emailError ? (
+            <Text style={styles.errorText}>{emailError}</Text>
+          ) : null}
+
+          {/* Password input */}
+          <TextInput
+            placeholder='Password'
+            value={password}
+            onChangeText={text => {
+              setPassword(text);
+              if (text.length > 0 && text.length < 6) {
+                setPasswordError('Password must be at least 6 characters');
+              } else {
+                setPasswordError('');
+              }
+            }}
+            secureTextEntry
+            style={styles.input}
+            placeholderTextColor='#999'
+          />
+          {passwordError ? (
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
+
+          {/* Login button */}
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+
+          {/* Navigation to registration */}
+          <TouchableOpacity
+            style={styles.linkContainer}
+            onPress={() => router.push('/(auth)/register')}
+          >
+            <Text style={styles.linkText}>
+              Don&apos;t have an account?{' '}
+              <Text style={styles.linkTextBold}>Register</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
-// Stylesheet for login form
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    margin: 24,
-    padding: 24,
-    borderRadius: 18,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  input: {
-    backgroundColor: '#e8e6f2',
-    height: 48,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    marginBottom: 12,
-    color: '#000',
-  },
-  button: {
-    backgroundColor: '#6a66a3',
-    borderRadius: 16,
-    paddingVertical: 14,
-    marginTop: 10,
-    marginBottom: 18,
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  link: {
-    textAlign: 'center',
-    color: '#000',
-  },
-  linkBold: {
-    fontWeight: 'bold',
-    color: '#6a66a3',
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-});

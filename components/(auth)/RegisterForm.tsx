@@ -5,17 +5,18 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useBackgroundColor } from '../../app/_layout';
+import WellMindLogo from '../../assets/images/WellMind.svg';
 import { supabase } from '../../lib/supabase';
+import { authStyles as styles } from './auth.styles';
 
 // Regular expression for email validation
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -26,9 +27,12 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [nameError, setNameError] = useState('');
   const router = useRouter();
+  const { backgroundColor } = useBackgroundColor();
 
-  // Email validation function
+  // Validates email format
   const validateEmail = (email: string) => {
     if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address');
@@ -38,127 +42,131 @@ export default function RegisterForm() {
     return true;
   };
 
-  // Password validation function
-  const validatePassword = (password: string) => {
-    if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters long');
-      return false;
-    }
-    setPasswordError('');
-    return true;
-  };
-
   // Handles user registration via Supabase
   const handleRegister = async () => {
-    if (!validateEmail(email) || !validatePassword(password)) return;
+    const isNameValid = fullName.trim().length > 0;
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = password.length >= 6;
 
-    const { error } = await supabase.auth.signUp({ email, password });
+    if (!isNameValid) {
+      setNameError('Please enter your full name');
+    } else {
+      setNameError('');
+    }
+
+    if (!isPasswordValid) {
+      setPasswordError('Password must be at least 6 characters');
+    } else {
+      setPasswordError('');
+    }
+
+    if (!isNameValid || !isEmailValid || !isPasswordValid) return;
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+    });
+
     if (error) {
       setPasswordError(error.message);
-    } else {
-      Alert.alert('Success', 'Check your email to confirm.');
-      router.replace('/(main)/wellmind');
+      return;
+    }
+
+    if (data.user) {
+      await supabase.from('users').insert({
+        id: data.user.id,
+        full_name: fullName.trim(),
+        email: data.user.email,
+      });
+      Alert.alert(
+        'Registration Successful',
+        'Please check your email to confirm your account.'
+      );
+      router.replace('/(auth)/login');
     }
   };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={80}
+      style={[styles.keyboardAvoidingView, { backgroundColor }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-      <ImageBackground
-        source={require('../../assets/images/velvet.jpg')}
-        style={{ flex: 1 }}
-        resizeMode='cover'
+      <ScrollView
+        contentContainerStyle={[styles.scrollContainer, { backgroundColor }]}
+        keyboardShouldPersistTaps='handled'
+        style={{ backgroundColor }}
       >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-          keyboardShouldPersistTaps='handled'
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: 'rgba(255, 255, 255, 0.8)' },
+          ]}
         >
-          <View style={styles.container}>
-            <Text style={styles.title}>Create Your Account</Text>
-
-            {/* Email input field */}
-            <TextInput
-              placeholder='Email'
-              value={email}
-              onChangeText={text => {
-                setEmail(text);
-                validateEmail(text);
-              }}
-              autoCapitalize='none'
-              keyboardType='email-address'
-              style={styles.input}
-              placeholderTextColor='#000'
-            />
-            {emailError && <Text style={styles.errorText}>{emailError}</Text>}
-
-            {/* Password input field */}
-            <TextInput
-              placeholder='Password'
-              value={password}
-              onChangeText={text => {
-                setPassword(text);
-                validatePassword(text);
-              }}
-              secureTextEntry
-              style={styles.input}
-              placeholderTextColor='#000'
-            />
-            {passwordError && (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            )}
-
-            {/* Submit button */}
-            <TouchableOpacity style={styles.button} onPress={handleRegister}>
-              <Text style={styles.buttonText}>Register</Text>
-            </TouchableOpacity>
+          <View style={styles.headerSection}>
+            <WellMindLogo width={100} height={100} style={styles.logo} />
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Join WellMind today</Text>
           </View>
-        </ScrollView>
-      </ImageBackground>
+
+          {/* Name input field */}
+          <TextInput
+            placeholder='Full Name'
+            value={fullName}
+            onChangeText={text => setFullName(text)}
+            style={styles.input}
+            placeholderTextColor='#999'
+            autoCapitalize='words'
+          />
+          {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
+
+          {/* Email input field */}
+          <TextInput
+            placeholder='Email'
+            value={email}
+            onChangeText={text => {
+              setEmail(text.trim());
+              validateEmail(text.trim());
+            }}
+            autoCapitalize='none'
+            keyboardType='email-address'
+            style={styles.input}
+            placeholderTextColor='#999'
+          />
+          {emailError ? (
+            <Text style={styles.errorText}>{emailError}</Text>
+          ) : null}
+
+          {/* Password input field */}
+          <TextInput
+            placeholder='Password (min. 6 characters)'
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+            placeholderTextColor='#999'
+          />
+          {passwordError ? (
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
+
+          {/* Submit button */}
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
+
+          {/* Link back to login */}
+          <TouchableOpacity
+            style={styles.linkContainer}
+            onPress={() => router.replace('/(auth)/login')}
+          >
+            <Text style={styles.linkText}>
+              Already have an account?{' '}
+              <Text style={styles.linkTextBold}>Login</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
-// Style definitions
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    margin: 24,
-    padding: 24,
-    borderRadius: 18,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  input: {
-    backgroundColor: '#e8e6f2',
-    height: 48,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    marginBottom: 12,
-    color: '#000',
-  },
-  button: {
-    backgroundColor: '#6a66a3',
-    borderRadius: 16,
-    paddingVertical: 14,
-    marginTop: 10,
-    marginBottom: 18,
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-});

@@ -1,19 +1,20 @@
 // app/(tabs)/journal/index.tsx
 // Journal Screen for displaying user's personal journal entries
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
+import { journalScreenStyles as styles } from '../../../styles/tabs/journal.styles';
+import { useBackgroundColor } from '../../_layout';
 
 interface Entry {
   id: string;
@@ -25,6 +26,7 @@ export default function JournalScreen() {
   const router = useRouter();
   const { refresh } = useLocalSearchParams();
   const [entries, setEntries] = useState<Entry[]>([]);
+  const { backgroundColor } = useBackgroundColor();
 
   // 🔄 Fetch journal entries for the authenticated user
   const fetchEntries = async () => {
@@ -58,136 +60,96 @@ export default function JournalScreen() {
     }, [refresh])
   );
 
-  // 📅 Format entry creation date
+  // 📅 Format entry creation date and time
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
-    return date.toLocaleDateString('en-US', {
+
+    // Format date (e.g., "05 Jun")
+    const formattedDate = date.toLocaleDateString('en-US', {
       day: '2-digit',
       month: 'short',
     });
+
+    // Format time (e.g., "14:23:08")
+    const formattedTime = date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    return `${formattedDate} ${formattedTime}`;
   };
 
   // 📝 Render each journal entry
   const renderItem = ({ item }: { item: Entry }) => (
-    <View style={styles.entryBox}>
+    <TouchableOpacity
+      style={styles.entryBox}
+      onPress={() =>
+        router.push(`/(tabs)/journal/edit-entry?id=${item.id}` as any)
+      }
+      activeOpacity={0.7}
+    >
       <Text style={styles.entryDate}>{formatDate(item.created_at)}</Text>
       <Text style={styles.entryText}>{item.content}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   // 🧱 UI Layout
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ImageBackground
-        source={require('../../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
+    <SafeAreaView style={{ flex: 1, backgroundColor }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.textBgWrapper}>
-            <View style={styles.textBgContent}>
+        <View style={[styles.container, { backgroundColor }]}>
+          {/* Enhanced Header Section */}
+          <View style={styles.headerSection}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleEmoji}>📖</Text>
               <Text style={styles.title}>My Journal</Text>
             </View>
           </View>
 
-          {/* List of entries */}
-          <FlatList
-            data={entries}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            showsVerticalScrollIndicator={false}
-          />
-
-          {/* Footer with navigation buttons */}
-          <View style={styles.footerBox}>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(main)/wellmind')}
-            >
-              <Text style={styles.footerButtonText}>Home</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(tabs)/journal/new-entry')}
-            >
-              <Text style={styles.footerButtonText}>＋</Text>
-            </TouchableOpacity>
+          {/* Entries Content */}
+          <View
+            style={[
+              styles.contentSection,
+              entries.length === 0 && {
+                justifyContent: 'center',
+                flexGrow: 1,
+              },
+            ]}
+          >
+            {entries.length === 0 ? (
+              <View style={styles.emptyStateContainer}>
+                <View style={styles.emptyStateBox}>
+                  <Text style={styles.emptyStateText}>No entries yet</Text>
+                  <Text style={styles.emptyStateSubtext}>
+                    Tap the + button to create your first journal entry.
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <FlatList
+                data={entries}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.listContentContainer}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
           </View>
+
+          {/* Floating plus button */}
+          <TouchableOpacity
+            style={styles.floatingAddButton}
+            onPress={() => router.push('/(tabs)/journal/new-entry' as any)}
+          >
+            <Text style={styles.addButtonText}>＋</Text>
+          </TouchableOpacity>
         </View>
-      </ImageBackground>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
-
-// 🎨 Styles
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-  },
-  textBgWrapper: {
-    position: 'relative',
-    marginBottom: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
-    minHeight: 120,
-    justifyContent: 'center',
-    width: '100%',
-  },
-  textBgContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    zIndex: 1,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  entryBox: {
-    backgroundColor: '#f2e9f4',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-  },
-  entryDate: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6a4c93',
-    marginBottom: 4,
-  },
-  entryText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  footerBox: {
-    flexDirection: 'row',
-    backgroundColor: '#b5838d',
-    borderRadius: 20,
-    padding: 16,
-    justifyContent: 'space-between',
-  },
-  footerButton: {
-    flex: 1,
-    backgroundColor: '#6a66a3',
-    paddingVertical: 12,
-    marginHorizontal: 6,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  footerButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});

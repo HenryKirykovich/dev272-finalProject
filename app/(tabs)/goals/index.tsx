@@ -5,15 +5,16 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
   FlatList,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+import { goalsScreenStyles as styles } from '../../../styles/tabs/goals.styles';
+import { useBackgroundColor } from '../../_layout';
 
 interface Goal {
   id: string;
@@ -24,9 +25,10 @@ interface Goal {
 }
 
 export default function GoalsScreen() {
+  const router = useRouter();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [showAll, setShowAll] = useState(false);
-  const router = useRouter();
+  const { backgroundColor } = useBackgroundColor();
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -101,30 +103,36 @@ export default function GoalsScreen() {
   // 🔧 Goal list item renderer
   const renderItem = ({ item }: { item: Goal }) => (
     <View style={[styles.goalBox, item.is_done && styles.goalDone]}>
-      <Text style={styles.goalText}>{item.title}</Text>
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={[styles.statusButton, item.is_done && styles.statusDone]}
-          onPress={() => toggleGoalStatus(item)}
-        >
-          <Text style={styles.statusButtonText}>
-            {item.is_done ? 'Undo' : 'Done'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.mainButton}
-          onPress={() => setAsMainGoal(item.id)}
-        >
-          <Text style={styles.statusButtonText}>
-            {item.show_on_home ? '✔ Main' : 'Show on Home'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => deleteGoal(item.id)}
-        >
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
+      {/* Wrapper to align text width with button row width */}
+      <View>
+        <View style={styles.goalTextContainer}>
+          <Text style={styles.goalText}>{item.title}</Text>
+        </View>
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={[styles.statusButton, item.is_done && styles.statusDone]}
+            onPress={() => toggleGoalStatus(item)}
+          >
+            <Text style={styles.statusButtonText}>
+              {item.is_done ? 'Undo' : 'Done'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.mainButton}
+            onPress={() => setAsMainGoal(item.id)}
+          >
+            <Text style={styles.statusButtonText}>
+              {item.show_on_home ? '✔ Main' : 'Show on Home'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => deleteGoal(item.id)}
+          >
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -138,148 +146,72 @@ export default function GoalsScreen() {
 
   // 🧱 UI rendering
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ImageBackground
-        source={require('../../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
+    <SafeAreaView style={{ flex: 1, backgroundColor }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Daily Goals</Text>
-            <TouchableOpacity onPress={() => setShowAll(!showAll)}>
-              <Text style={styles.toggleText}>
-                {showAll ? 'Show Today Only' : 'Show All Goals'}
+        <View style={[styles.container, { backgroundColor }]}>
+          {/* Enhanced Header Section */}
+          <View style={styles.headerSection}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleEmoji}>🎯</Text>
+              <Text style={styles.title}>Daily Goals</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.toggleButton}
+              onPress={() => setShowAll(!showAll)}
+            >
+              <Text style={styles.toggleButtonText}>
+                {showAll ? '📅 Today Only' : '🗂️ Show All'}
               </Text>
             </TouchableOpacity>
           </View>
 
-          <FlatList
-            data={filteredGoals}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            showsVerticalScrollIndicator={false}
-          />
-
-          {/* Footer navigation buttons */}
-          <View style={styles.footerBox}>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(main)/wellmind')}
-            >
-              <Text style={styles.footerButtonText}>Home</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => router.push('/(tabs)/goals/new-goals')}
-            >
-              <Text style={styles.footerButtonText}>＋</Text>
-            </TouchableOpacity>
+          {/* Goals Content - takes remaining space */}
+          <View
+            style={[
+              styles.contentSection,
+              filteredGoals.length === 0 && {
+                justifyContent: 'center',
+                flexGrow: 1,
+              },
+            ]}
+          >
+            {filteredGoals.length === 0 ? (
+              <View style={styles.emptyStateContainer}>
+                <View style={styles.emptyStateBox}>
+                  <Text style={styles.emptyStateText}>
+                    {showAll ? 'No goals yet' : 'No goals for today'}
+                  </Text>
+                  <Text style={styles.emptyStateSubtext}>
+                    {showAll
+                      ? 'Tap the + button to create your first goal'
+                      : 'Tap the + button to add a goal for today'}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredGoals}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.listContentContainer}
+                showsVerticalScrollIndicator={false}
+                style={styles.goalsList}
+              />
+            )}
           </View>
+
+          {/* Floating plus button */}
+          <TouchableOpacity
+            style={styles.floatingAddButton}
+            onPress={() => router.push('/(tabs)/goals/new-goals' as any)}
+          >
+            <Text style={styles.addButtonText}>＋</Text>
+          </TouchableOpacity>
         </View>
-      </ImageBackground>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-  },
-  header: {
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 8,
-  },
-  toggleText: {
-    fontSize: 14,
-    color: '#6a4c93',
-    textDecorationLine: 'underline',
-  },
-  goalBox: {
-    backgroundColor: '#f2e9f4',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-  },
-  goalText: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 8,
-  },
-  goalDone: {
-    backgroundColor: '#c5e1a5',
-  },
-  statusButton: {
-    backgroundColor: '#6a66a3',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-    marginRight: 10,
-  },
-  mainButton: {
-    backgroundColor: '#ffb347',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  statusDone: {
-    backgroundColor: '#a67db8',
-  },
-  statusButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  deleteButton: {
-    backgroundColor: '#aa3333',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-    marginLeft: 10,
-  },
-  deleteButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  footerBox: {
-    flexDirection: 'row',
-    backgroundColor: '#b5838d',
-    borderRadius: 20,
-    padding: 16,
-    justifyContent: 'space-between',
-  },
-  footerButton: {
-    flex: 1,
-    backgroundColor: '#6a66a3',
-    paddingVertical: 12,
-    marginHorizontal: 6,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  footerButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-  },
-});

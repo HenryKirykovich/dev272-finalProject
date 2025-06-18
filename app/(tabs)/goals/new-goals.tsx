@@ -2,27 +2,35 @@
 // It is built using React Native and Expo, with Supabase as the backend for user authentication/
 //app/(tabs)/goals/new-goal.tsx
 
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  ScrollView,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
+import { newGoalStyles as styles } from '../../../styles/tabs/goals.styles';
+import { useBackgroundColor } from '../../_layout';
 
 export default function NewGoalScreen() {
   const [goal, setGoal] = useState('');
   const router = useRouter();
+  const { backgroundColor } = useBackgroundColor();
 
   const handleSave = async () => {
+    // 🚫 Prevent saving empty goals
+    if (!goal.trim()) {
+      Alert.alert('Error', 'Goal cannot be empty.');
+      return;
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -39,124 +47,63 @@ export default function NewGoalScreen() {
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      router.push('/(tabs)/goals');
+      router.push('/goals' as any);
     }
   };
 
+  // ⏪ Navigate back to the previous screen
+  const handleBack = () => {
+    router.push('/goals' as any);
+  };
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}
-    >
-      <ImageBackground
-        source={require('../../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
+    <SafeAreaView style={{ flex: 1, backgroundColor }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}
       >
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor }]}>
+          {/* Enhanced Header Section */}
+          <View style={styles.headerSection}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleEmoji}>✨</Text>
+              <Text style={styles.title}>New Goal</Text>
+            </View>
+            <Text style={styles.subtitle}>Describe your goal for today</Text>
+          </View>
+
+          {/* Content Section */}
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.textBgWrapper}>
-              <View style={styles.textBgContent}>
-                <Text style={styles.title}>New Goal</Text>
-                <Text style={styles.subtitle}>
-                  Describe your goal for today
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.inputBox}>
+            {/* Input Container */}
+            <View style={styles.inputContainer}>
               <TextInput
                 value={goal}
                 onChangeText={setGoal}
-                placeholder='Type your goal...'
-                placeholderTextColor='#fff'
+                placeholder='Type your goal here...'
+                placeholderTextColor='rgba(255, 255, 255, 0.7)'
                 style={styles.input}
                 multiline
               />
             </View>
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save</Text>
-            </TouchableOpacity>
+            {/* Action Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                <Text style={styles.saveButtonText}>💾 Save Goal</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+                <Text style={styles.backButtonText}>← Back</Text>
+              </TouchableOpacity>
+            </View>
           </ScrollView>
         </View>
-      </ImageBackground>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    alignItems: 'center',
-  },
-  textBgWrapper: {
-    position: 'relative',
-    marginBottom: 24,
-    borderRadius: 16,
-    overflow: 'hidden',
-    minHeight: 300,
-    justifyContent: 'center',
-    width: '100%',
-  },
-  textBgContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    zIndex: 1,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#000',
-    textAlign: 'center',
-    marginBottom: 2,
-    marginTop: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#000',
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  inputBox: {
-    backgroundColor: '#6a66a3',
-    borderRadius: 16,
-    padding: 16,
-    width: '100%',
-    minHeight: 160,
-    marginBottom: 30,
-  },
-  input: {
-    color: '#fff',
-    fontSize: 16,
-    textAlignVertical: 'top',
-    minHeight: 120,
-  },
-  saveButton: {
-    backgroundColor: '#6a66a3',
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-    borderRadius: 16,
-    alignSelf: 'center',
-    marginBottom: 10,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});

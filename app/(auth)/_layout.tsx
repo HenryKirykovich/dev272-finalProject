@@ -5,8 +5,9 @@ export default function AuthLayout() {
     <Stack
       screenOptions={{
         headerTitleAlign: 'center',
-        headerStyle: { backgroundColor: '#fff' },
-        headerTintColor: '#000',
+        headerStyle: { backgroundColor: 'transparent' },
+        headerTintColor: '#2d1b69',
+        headerShown: false, // Hide header completely to avoid any background issues
       }}
     >
       <Stack.Screen

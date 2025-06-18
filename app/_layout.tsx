@@ -1,74 +1,138 @@
-import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { ActivityIndicator, Alert } from 'react-native';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
+
+// --- Start of BackgroundColor Context ---
+type BackgroundColorContextType = {
+  backgroundColor: string;
+  setBackgroundColor: (color: string) => void;
+};
+
+const BackgroundColorContext = createContext<
+  BackgroundColorContextType | undefined
+>(undefined);
+
+const BackgroundColorProvider = ({ children }: { children: ReactNode }) => {
+  const [backgroundColor, setBackgroundColor] = useState('#F48FB1'); // Default color
+
+  useEffect(() => {
+    const loadBackgroundColor = async () => {
+      const storedColor = await AsyncStorage.getItem('backgroundColor');
+      if (storedColor) {
+        setBackgroundColor(storedColor);
+      }
+    };
+    loadBackgroundColor();
+  }, []);
+
+  const handleSetBackgroundColor = (color: string) => {
+    console.log('Setting background color to:', color);
+    setBackgroundColor(color);
+    AsyncStorage.setItem('backgroundColor', color);
+  };
+
+  return (
+    <BackgroundColorContext.Provider
+      value={{ backgroundColor, setBackgroundColor: handleSetBackgroundColor }}
+    >
+      {children}
+    </BackgroundColorContext.Provider>
+  );
+};
+
+export const useBackgroundColor = () => {
+  const context = useContext(BackgroundColorContext);
+  if (context === undefined) {
+    throw new Error(
+      'useBackgroundColor must be used within a BackgroundColorProvider'
+    );
+  }
+  return context;
+};
+// --- End of BackgroundColor Context ---
 
 export const unstable_settings = {
   showDebugInfo: false,
 };
 
-export default function RootLayout() {
+function RootLayoutNav() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const router = useRouter();
+  const segments = useSegments();
+  const { backgroundColor } = useBackgroundColor();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setIsLoggedIn(!!user);
     });
 
-    registerForPushNotificationsAsync().then(token => {
-      console.log('Expo push token:', token);
-      // 💡 Optionally save to Supabase here
+    const {
+      data: { subscription: authSub },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
     });
 
-    // Optional: handle notification received while app is in foreground
-    const subscription = Notifications.addNotificationReceivedListener(
-      notification => {
-        console.log('Notification Received:', notification);
-      }
-    );
-
-    return () => subscription.remove();
+    return () => {
+      authSub.unsubscribe();
+    };
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      const first = segments[0];
+      const second = segments[1];
+
+      const inAuthGroup = first === '(auth)';
+      const isAllowedAuthScreen =
+        inAuthGroup && (second === 'login' || second === 'register');
+
+      if (!isAllowedAuthScreen) {
+        router.replace('/(auth)/login');
+      }
+    }
+    if (isLoggedIn === true) {
+      const first = segments[0];
+      const second = segments[1];
+      const inAuthGroup = first === '(auth)';
+      const isAuthEntry = second === 'login' || second === 'register';
+      if (inAuthGroup && isAuthEntry) {
+        router.replace('/(tabs)/home');
+      }
+    }
+  }, [segments, isLoggedIn]);
 
   if (isLoggedIn === null) return <ActivityIndicator style={{ flex: 1 }} />;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {!isLoggedIn && (
-        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-      )}
-      {isLoggedIn && (
-        <Stack.Screen name='(main)' options={{ headerShown: false }} />
-      )}
-      {isLoggedIn && (
-        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-      )}
-    </Stack>
+    <View style={{ flex: 1, backgroundColor }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor },
+        }}
+      >
+        {isLoggedIn ? (
+          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+        ) : (
+          <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+        )}
+      </Stack>
+    </View>
   );
 }
 
-// 📦 Helper: register device for push notifications
-async function registerForPushNotificationsAsync() {
-  if (!Device.isDevice) {
-    Alert.alert('Must use physical device for Push Notifications');
-    return null;
-  }
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') {
-    Alert.alert('Failed to get push token for push notification!');
-    return null;
-  }
-
-  const token = (await Notifications.getExpoPushTokenAsync()).data;
-  return token;
+export default function RootLayout() {
+  return (
+    <BackgroundColorProvider>
+      <RootLayoutNav />
+    </BackgroundColorProvider>
+  );
 }
