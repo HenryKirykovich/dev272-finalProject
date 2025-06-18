@@ -15,7 +15,7 @@ import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
 import { profileFormStyles as styles } from './profile-form.styles';
 
-const BG_COLORS = ['#FCE4EC', '#F3E5F5', '#E1F5FE', '#E8F5E9', '#FFFDE7'];
+const BG_COLORS = ['#F48FB1', '#CE93D8', '#90CAF9', '#A5D6A7', '#FFE082'];
 
 export default function ProfileForm() {
   const [fullName, setFullName] = useState('');

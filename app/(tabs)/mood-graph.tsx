@@ -179,7 +179,7 @@ export default function MoodGraphScreen() {
               withOuterLines={false}
               chartConfig={{
                 backgroundColor: '#fff',
-                backgroundGradientFrom: '#e0caff',
+                backgroundGradientFrom: '#fff',
                 backgroundGradientTo: '#fff',
                 decimalPlaces: 0,
                 color: (opacity = 1) => `rgba(106, 102, 163, ${opacity})`,

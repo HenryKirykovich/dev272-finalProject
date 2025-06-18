@@ -150,7 +150,7 @@ export const goalsScreenStyles = StyleSheet.create({
         fontSize: 14,
     },
     goalBox: {
-        backgroundColor: '#f2e9f4',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
@@ -158,7 +158,7 @@ export const goalsScreenStyles = StyleSheet.create({
         alignItems: 'center',
     },
     goalTextContainer: {
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        backgroundColor: 'transparent',
         padding: 12,
         borderRadius: 12,
         marginBottom: 12,
@@ -166,7 +166,7 @@ export const goalsScreenStyles = StyleSheet.create({
     },
     goalText: {
         fontSize: 16,
-        color: '#333',
+        color: '#000000',
         textAlign: 'center',
         fontWeight: '500',
     },

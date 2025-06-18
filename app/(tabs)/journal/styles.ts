@@ -161,7 +161,7 @@ export const journalScreenStyles = StyleSheet.create({
         paddingBottom: 20,
     },
     entryBox: {
-        backgroundColor: '#f2e9f4',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
@@ -169,12 +169,12 @@ export const journalScreenStyles = StyleSheet.create({
     entryDate: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#6a4c93',
+        color: '#555555',
         marginBottom: 8,
     },
     entryText: {
         fontSize: 16,
-        color: '#333',
+        color: '#000000',
         lineHeight: 22,
     },
     floatingAddButton: {
