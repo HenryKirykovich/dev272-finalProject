@@ -108,13 +108,23 @@ export default function JournalScreen() {
           </View>
 
           {/* Entries Content */}
-          <View style={styles.contentSection}>
+          <View
+            style={[
+              styles.contentSection,
+              entries.length === 0 && {
+                justifyContent: 'center',
+                flexGrow: 1,
+              },
+            ]}
+          >
             {entries.length === 0 ? (
               <View style={styles.emptyStateContainer}>
-                <Text style={styles.emptyStateText}>No entries yet</Text>
-                <Text style={styles.emptyStateSubtext}>
-                  Tap the + button to create your first journal entry.
-                </Text>
+                <View style={styles.emptyStateBox}>
+                  <Text style={styles.emptyStateText}>No entries yet</Text>
+                  <Text style={styles.emptyStateSubtext}>
+                    Tap the + button to create your first journal entry.
+                  </Text>
+                </View>
               </View>
             ) : (
               <FlatList

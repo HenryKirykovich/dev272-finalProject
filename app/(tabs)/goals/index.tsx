@@ -171,17 +171,27 @@ export default function GoalsScreen() {
           </View>
 
           {/* Goals Content - takes remaining space */}
-          <View style={styles.contentSection}>
+          <View
+            style={[
+              styles.contentSection,
+              filteredGoals.length === 0 && {
+                justifyContent: 'center',
+                flexGrow: 1,
+              },
+            ]}
+          >
             {filteredGoals.length === 0 ? (
               <View style={styles.emptyStateContainer}>
-                <Text style={styles.emptyStateText}>
-                  {showAll ? 'No goals yet' : 'No goals for today'}
-                </Text>
-                <Text style={styles.emptyStateSubtext}>
-                  {showAll
-                    ? 'Tap the + button to create your first goal'
-                    : 'Tap the + button to add a goal for today'}
-                </Text>
+                <View style={styles.emptyStateBox}>
+                  <Text style={styles.emptyStateText}>
+                    {showAll ? 'No goals yet' : 'No goals for today'}
+                  </Text>
+                  <Text style={styles.emptyStateSubtext}>
+                    {showAll
+                      ? 'Tap the + button to create your first goal'
+                      : 'Tap the + button to add a goal for today'}
+                  </Text>
+                </View>
               </View>
             ) : (
               <FlatList
