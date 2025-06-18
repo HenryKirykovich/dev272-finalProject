@@ -1,21 +1,21 @@
 // MoodGraphScreen displays the user's mood history as a line chart.
 // It allows filtering by week, month, or all time.
 
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  ImageBackground,
   ActivityIndicator,
   Dimensions,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 
 // Converts mood emoji string to a numeric value for graph plotting
@@ -136,7 +136,13 @@ export default function MoodGraphScreen() {
                   ]}
                   onPress={() => setRange(r as any)}
                 >
-                  <Text style={styles.rangeButtonText}>
+                  <Text
+                    style={
+                      range === r
+                        ? styles.rangeButtonTextSelected
+                        : styles.rangeButtonText
+                    }
+                  >
                     {r.charAt(0).toUpperCase() + r.slice(1)}
                   </Text>
                 </TouchableOpacity>
@@ -194,9 +200,9 @@ export default function MoodGraphScreen() {
             <View style={styles.moodLegendWrapper}>
               <Text style={styles.moodLegendTitle}>Mood Scale:</Text>
               <View style={styles.moodLegendRow}>
-                <Text style={styles.moodLegendLabel}>1 = Sad</Text>
-                <Text style={styles.moodLegendLabel}>2 = Neutral</Text>
-                <Text style={styles.moodLegendLabel}>3 = Happy</Text>
+                <Text style={styles.moodLegendLabel}>😐 = Sad</Text>
+                <Text style={styles.moodLegendLabel}>😔 = Neutral</Text>
+                <Text style={styles.moodLegendLabel}>🙂 = Happy</Text>
               </View>
             </View>
           </ScrollView>
@@ -239,19 +245,26 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 16, color: '#000' },
   rangeButton: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     marginHorizontal: 4,
-    borderRadius: 10,
-    backgroundColor: '#ccc',
+    borderRadius: 12,
+    backgroundColor: '#ffffffcc',
+    borderWidth: 1,
+    borderColor: '#6a66a3',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   rangeButtonSelected: {
     backgroundColor: '#6a66a3',
   },
   rangeButtonText: {
-    color: '#fff',
+    color: '#6a66a3',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
+  },
+  rangeButtonTextSelected: {
+    color: '#fff',
   },
   footerBox: {
     flexDirection: 'row',
