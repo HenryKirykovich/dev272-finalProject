@@ -17,7 +17,7 @@
         "foregroundImage": "./assets/images/WellMind.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": false
     },
     "web": {
       "bundler": "metro",
