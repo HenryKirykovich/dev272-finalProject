@@ -168,6 +168,14 @@ export default function RegisterForm() {
             <TouchableOpacity style={styles.button} onPress={handleRegister}>
               <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
+
+            {/* Link back to login */}
+            <TouchableOpacity onPress={() => router.replace('/(auth)/login')}>
+              <Text style={styles.link}>
+                Already have an account?{' '}
+                <Text style={styles.linkBold}>Login</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </ImageBackground>
@@ -209,6 +217,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  link: {
+    textAlign: 'center',
+    color: '#000',
+  },
+  linkBold: {
+    fontWeight: 'bold',
+    color: '#6a66a3',
   },
   errorText: {
     color: 'red',
