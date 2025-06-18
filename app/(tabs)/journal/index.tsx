@@ -5,7 +5,6 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
   FlatList,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -13,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+import { useBackgroundColor } from '../../_layout';
 import { journalScreenStyles as styles } from './styles';
 
 interface Entry {
@@ -25,6 +25,7 @@ export default function JournalScreen() {
   const router = useRouter();
   const { refresh } = useLocalSearchParams();
   const [entries, setEntries] = useState<Entry[]>([]);
+  const { backgroundColor } = useBackgroundColor();
 
   // 🔄 Fetch journal entries for the authenticated user
   const fetchEntries = async () => {
@@ -90,62 +91,56 @@ export default function JournalScreen() {
   // 🧱 UI Layout
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ImageBackground
-        source={require('../../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
-      >
-        <View style={styles.container}>
-          {/* Enhanced Header Section */}
-          <View style={styles.headerSection}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.titleEmoji}>📖</Text>
-              <Text style={styles.title}>My Journal</Text>
-            </View>
+      <View style={[styles.container, { backgroundColor }]}>
+        {/* Enhanced Header Section */}
+        <View style={styles.headerSection}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleEmoji}>📖</Text>
+            <Text style={styles.title}>My Journal</Text>
           </View>
-
-          {/* Entries Content */}
-          <View
-            style={[
-              styles.contentSection,
-              entries.length === 0 && {
-                justifyContent: 'center',
-                flexGrow: 1,
-              },
-            ]}
-          >
-            {entries.length === 0 ? (
-              <View style={styles.emptyStateContainer}>
-                <View style={styles.emptyStateBox}>
-                  <Text style={styles.emptyStateText}>No entries yet</Text>
-                  <Text style={styles.emptyStateSubtext}>
-                    Tap the + button to create your first journal entry.
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              <FlatList
-                data={entries}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.listContentContainer}
-                showsVerticalScrollIndicator={false}
-              />
-            )}
-          </View>
-
-          {/* Floating plus button */}
-          <TouchableOpacity
-            style={styles.floatingAddButton}
-            onPress={() => router.push('/(tabs)/journal/new-entry' as any)}
-          >
-            <Text style={styles.addButtonText}>＋</Text>
-          </TouchableOpacity>
         </View>
-      </ImageBackground>
+
+        {/* Entries Content */}
+        <View
+          style={[
+            styles.contentSection,
+            entries.length === 0 && {
+              justifyContent: 'center',
+              flexGrow: 1,
+            },
+          ]}
+        >
+          {entries.length === 0 ? (
+            <View style={styles.emptyStateContainer}>
+              <View style={styles.emptyStateBox}>
+                <Text style={styles.emptyStateText}>No entries yet</Text>
+                <Text style={styles.emptyStateSubtext}>
+                  Tap the + button to create your first journal entry.
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <FlatList
+              data={entries}
+              renderItem={renderItem}
+              keyExtractor={item => item.id}
+              contentContainerStyle={styles.listContentContainer}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+        </View>
+
+        {/* Floating plus button */}
+        <TouchableOpacity
+          style={styles.floatingAddButton}
+          onPress={() => router.push('/(tabs)/journal/new-entry' as any)}
+        >
+          <Text style={styles.addButtonText}>＋</Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 }

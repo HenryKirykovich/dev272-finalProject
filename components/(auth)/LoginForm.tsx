@@ -4,7 +4,6 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useBackgroundColor } from '../../app/_layout';
 import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
 import { authStyles as styles } from './auth.styles';
@@ -27,6 +27,9 @@ export default function LoginForm() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const router = useRouter();
+  const { backgroundColor } = useBackgroundColor();
+
+  console.log('Login form backgroundColor:', backgroundColor);
 
   // Redirect already authenticated users to main page
   useEffect(() => {
@@ -70,83 +73,81 @@ export default function LoginForm() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardAvoidingView}
+      style={[styles.keyboardAvoidingView, { backgroundColor }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-      <ImageBackground
-        source={require('../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
+      <ScrollView
+        contentContainerStyle={[styles.scrollContainer, { backgroundColor }]}
+        keyboardShouldPersistTaps='handled'
+        style={{ backgroundColor }}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps='handled'
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: 'rgba(255, 255, 255, 0.8)' },
+          ]}
         >
-          <View style={styles.container}>
-            <View style={styles.headerSection}>
-              <WellMindLogo width={100} height={100} style={styles.logo} />
-              <Text style={styles.title}>Welcome Back</Text>
-              <Text style={styles.subtitle}>
-                Login to your WellMind account
-              </Text>
-            </View>
-
-            {/* Email input */}
-            <TextInput
-              placeholder='Email'
-              value={email}
-              onChangeText={text => {
-                setEmail(text.trim());
-                validateEmail(text.trim());
-              }}
-              autoCapitalize='none'
-              keyboardType='email-address'
-              style={styles.input}
-              placeholderTextColor='#999'
-            />
-            {emailError ? (
-              <Text style={styles.errorText}>{emailError}</Text>
-            ) : null}
-
-            {/* Password input */}
-            <TextInput
-              placeholder='Password'
-              value={password}
-              onChangeText={text => {
-                setPassword(text);
-                if (text.length > 0 && text.length < 6) {
-                  setPasswordError('Password must be at least 6 characters');
-                } else {
-                  setPasswordError('');
-                }
-              }}
-              secureTextEntry
-              style={styles.input}
-              placeholderTextColor='#999'
-            />
-            {passwordError ? (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            ) : null}
-
-            {/* Login button */}
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-
-            {/* Navigation to registration */}
-            <TouchableOpacity
-              style={styles.linkContainer}
-              onPress={() => router.push('/(auth)/register')}
-            >
-              <Text style={styles.linkText}>
-                Don&apos;t have an account?{' '}
-                <Text style={styles.linkTextBold}>Register</Text>
-              </Text>
-            </TouchableOpacity>
+          <View style={styles.headerSection}>
+            <WellMindLogo width={100} height={100} style={styles.logo} />
+            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.subtitle}>Login to your WellMind account</Text>
           </View>
-        </ScrollView>
-      </ImageBackground>
+
+          {/* Email input */}
+          <TextInput
+            placeholder='Email'
+            value={email}
+            onChangeText={text => {
+              setEmail(text.trim());
+              validateEmail(text.trim());
+            }}
+            autoCapitalize='none'
+            keyboardType='email-address'
+            style={styles.input}
+            placeholderTextColor='#999'
+          />
+          {emailError ? (
+            <Text style={styles.errorText}>{emailError}</Text>
+          ) : null}
+
+          {/* Password input */}
+          <TextInput
+            placeholder='Password'
+            value={password}
+            onChangeText={text => {
+              setPassword(text);
+              if (text.length > 0 && text.length < 6) {
+                setPasswordError('Password must be at least 6 characters');
+              } else {
+                setPasswordError('');
+              }
+            }}
+            secureTextEntry
+            style={styles.input}
+            placeholderTextColor='#999'
+          />
+          {passwordError ? (
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
+
+          {/* Login button */}
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+
+          {/* Navigation to registration */}
+          <TouchableOpacity
+            style={styles.linkContainer}
+            onPress={() => router.push('/(auth)/register')}
+          >
+            <Text style={styles.linkText}>
+              Don&apos;t have an account?{' '}
+              <Text style={styles.linkTextBold}>Register</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

@@ -2,10 +2,9 @@
 // Registration screen for new users using Supabase authentication
 
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useBackgroundColor } from '../../app/_layout';
 import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
 import { authStyles as styles } from './auth.styles';
@@ -30,17 +30,11 @@ export default function RegisterForm() {
   const [fullName, setFullName] = useState('');
   const [nameError, setNameError] = useState('');
   const router = useRouter();
+  const { backgroundColor } = useBackgroundColor();
 
-  // Redirect already authenticated users to main page
-  useEffect(() => {
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        router.replace('/(tabs)/home');
-      }
-    });
-  }, []);
+  console.log('Register form backgroundColor:', backgroundColor);
 
-  // Email validation function
+  // Validates email format
   const validateEmail = (email: string) => {
     if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address');
@@ -96,87 +90,85 @@ export default function RegisterForm() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardAvoidingView}
+      style={[styles.keyboardAvoidingView, { backgroundColor }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-      <ImageBackground
-        source={require('../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
+      <ScrollView
+        contentContainerStyle={[styles.scrollContainer, { backgroundColor }]}
+        keyboardShouldPersistTaps='handled'
+        style={{ backgroundColor }}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps='handled'
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: 'rgba(255, 255, 255, 0.8)' },
+          ]}
         >
-          <View style={styles.container}>
-            <View style={styles.headerSection}>
-              <WellMindLogo width={100} height={100} style={styles.logo} />
-              <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Join WellMind today</Text>
-            </View>
-
-            {/* Name input field */}
-            <TextInput
-              placeholder='Full Name'
-              value={fullName}
-              onChangeText={text => setFullName(text)}
-              style={styles.input}
-              placeholderTextColor='#999'
-              autoCapitalize='words'
-            />
-            {nameError ? (
-              <Text style={styles.errorText}>{nameError}</Text>
-            ) : null}
-
-            {/* Email input field */}
-            <TextInput
-              placeholder='Email'
-              value={email}
-              onChangeText={text => {
-                setEmail(text.trim());
-                validateEmail(text.trim());
-              }}
-              autoCapitalize='none'
-              keyboardType='email-address'
-              style={styles.input}
-              placeholderTextColor='#999'
-            />
-            {emailError ? (
-              <Text style={styles.errorText}>{emailError}</Text>
-            ) : null}
-
-            {/* Password input field */}
-            <TextInput
-              placeholder='Password (min. 6 characters)'
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              style={styles.input}
-              placeholderTextColor='#999'
-            />
-            {passwordError ? (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            ) : null}
-
-            {/* Submit button */}
-            <TouchableOpacity style={styles.button} onPress={handleRegister}>
-              <Text style={styles.buttonText}>Register</Text>
-            </TouchableOpacity>
-
-            {/* Link back to login */}
-            <TouchableOpacity
-              style={styles.linkContainer}
-              onPress={() => router.replace('/(auth)/login')}
-            >
-              <Text style={styles.linkText}>
-                Already have an account?{' '}
-                <Text style={styles.linkTextBold}>Login</Text>
-              </Text>
-            </TouchableOpacity>
+          <View style={styles.headerSection}>
+            <WellMindLogo width={100} height={100} style={styles.logo} />
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Join WellMind today</Text>
           </View>
-        </ScrollView>
-      </ImageBackground>
+
+          {/* Name input field */}
+          <TextInput
+            placeholder='Full Name'
+            value={fullName}
+            onChangeText={text => setFullName(text)}
+            style={styles.input}
+            placeholderTextColor='#999'
+            autoCapitalize='words'
+          />
+          {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
+
+          {/* Email input field */}
+          <TextInput
+            placeholder='Email'
+            value={email}
+            onChangeText={text => {
+              setEmail(text.trim());
+              validateEmail(text.trim());
+            }}
+            autoCapitalize='none'
+            keyboardType='email-address'
+            style={styles.input}
+            placeholderTextColor='#999'
+          />
+          {emailError ? (
+            <Text style={styles.errorText}>{emailError}</Text>
+          ) : null}
+
+          {/* Password input field */}
+          <TextInput
+            placeholder='Password (min. 6 characters)'
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+            placeholderTextColor='#999'
+          />
+          {passwordError ? (
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
+
+          {/* Submit button */}
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
+
+          {/* Link back to login */}
+          <TouchableOpacity
+            style={styles.linkContainer}
+            onPress={() => router.replace('/(auth)/login')}
+          >
+            <Text style={styles.linkText}>
+              Already have an account?{' '}
+              <Text style={styles.linkTextBold}>Login</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

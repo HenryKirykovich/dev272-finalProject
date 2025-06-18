@@ -6,7 +6,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -16,6 +15,7 @@ import {
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { supabase } from '../../lib/supabase';
+import { useBackgroundColor } from '../_layout';
 import { moodGraphStyles as styles } from './mood-graph.styles';
 
 // Converts mood emoji string to a numeric value for graph plotting
@@ -43,6 +43,7 @@ export default function MoodGraphScreen() {
   const [values, setValues] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<'week' | 'month' | 'all'>('week');
+  const { backgroundColor } = useBackgroundColor();
 
   // Fetch mood logs from Supabase for the selected date range
   const fetchMoodLogs = useCallback(async () => {
@@ -110,116 +111,110 @@ export default function MoodGraphScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ImageBackground
-        source={require('../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
+      <ScrollView
+        style={[styles.scrollContent, { backgroundColor }]}
+        contentContainerStyle={[styles.container, { backgroundColor }]}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          style={styles.scrollContent}
-          contentContainerStyle={styles.container}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View style={styles.headerSection}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.titleEmoji}>📈</Text>
-              <Text style={styles.title}>Mood Chart</Text>
-            </View>
-            <Text style={styles.subtitle}>Track your mood over time</Text>
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleEmoji}>📈</Text>
+            <Text style={styles.title}>Mood Chart</Text>
           </View>
+          <Text style={styles.subtitle}>Track your mood over time</Text>
+        </View>
 
-          {/* Range Selector */}
-          <View style={styles.rangeSelectorContainer}>
-            {['week', 'month', 'all'].map(r => (
-              <TouchableOpacity
-                key={r}
-                style={[
-                  styles.rangeButton,
-                  range === r && styles.rangeButtonSelected,
-                ]}
-                onPress={() => setRange(r as any)}
+        {/* Range Selector */}
+        <View style={styles.rangeSelectorContainer}>
+          {['week', 'month', 'all'].map(r => (
+            <TouchableOpacity
+              key={r}
+              style={[
+                styles.rangeButton,
+                range === r && styles.rangeButtonSelected,
+              ]}
+              onPress={() => setRange(r as any)}
+            >
+              <Text
+                style={
+                  range === r
+                    ? styles.rangeButtonTextSelected
+                    : styles.rangeButtonText
+                }
               >
-                <Text
-                  style={
-                    range === r
-                      ? styles.rangeButtonTextSelected
-                      : styles.rangeButtonText
-                  }
-                >
-                  {r.charAt(0).toUpperCase() + r.slice(1)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-          {/* Mood Chart */}
-          <View style={styles.chartWrapper}>
-            {loading ? (
-              <ActivityIndicator
-                size='large'
-                style={styles.loadingIndicator}
-                color='#6a66a3'
-              />
-            ) : values.length === 0 ? (
-              <Text style={styles.noDataText}>No data for selected range</Text>
-            ) : (
-              <LineChart
-                data={{
-                  labels: reducedLabels,
-                  datasets: [{ data: values }],
-                }}
-                width={Dimensions.get('window').width - 40}
-                height={240}
-                yLabelsOffset={8}
-                yAxisInterval={1}
-                yAxisLabel=''
-                yAxisSuffix=''
-                fromZero
-                withInnerLines={false}
-                withOuterLines={false}
-                chartConfig={{
-                  backgroundColor: '#fff',
-                  backgroundGradientFrom: '#e0caff',
-                  backgroundGradientTo: '#fff',
-                  decimalPlaces: 0,
-                  color: (opacity = 1) => `rgba(106, 102, 163, ${opacity})`,
-                  labelColor: () => '#333',
-                  propsForDots: {
-                    r: '4',
-                    strokeWidth: '2',
-                    stroke: '#6a66a3',
-                  },
-                  fillShadowGradient: '#6a66a3',
-                  fillShadowGradientOpacity: 0.2,
-                }}
-                bezier
-                style={{ borderRadius: 16, marginTop: 10 }}
-                segments={3}
-                formatYLabel={val => {
-                  if (val === '1') return 'Sad';
-                  if (val === '2') return 'Neutral';
-                  if (val === '3') return 'Happy';
-                  return '';
-                }}
-              />
-            )}
-          </View>
+        {/* Mood Chart */}
+        <View style={styles.chartWrapper}>
+          {loading ? (
+            <ActivityIndicator
+              size='large'
+              style={styles.loadingIndicator}
+              color='#6a66a3'
+            />
+          ) : values.length === 0 ? (
+            <Text style={styles.noDataText}>No data for selected range</Text>
+          ) : (
+            <LineChart
+              data={{
+                labels: reducedLabels,
+                datasets: [{ data: values }],
+              }}
+              width={Dimensions.get('window').width - 40}
+              height={240}
+              yLabelsOffset={8}
+              yAxisInterval={1}
+              yAxisLabel=''
+              yAxisSuffix=''
+              fromZero
+              withInnerLines={false}
+              withOuterLines={false}
+              chartConfig={{
+                backgroundColor: '#fff',
+                backgroundGradientFrom: '#e0caff',
+                backgroundGradientTo: '#fff',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(106, 102, 163, ${opacity})`,
+                labelColor: () => '#333',
+                propsForDots: {
+                  r: '4',
+                  strokeWidth: '2',
+                  stroke: '#6a66a3',
+                },
+                fillShadowGradient: '#6a66a3',
+                fillShadowGradientOpacity: 0.2,
+              }}
+              bezier
+              style={{ borderRadius: 16, marginTop: 10 }}
+              segments={3}
+              formatYLabel={val => {
+                if (val === '1') return 'Sad';
+                if (val === '2') return 'Neutral';
+                if (val === '3') return 'Happy';
+                return '';
+              }}
+            />
+          )}
+        </View>
 
-          {/* Mood Scale Explanation */}
-          <View style={styles.moodLegendWrapper}>
-            <Text style={styles.moodLegendTitle}>Mood Scale:</Text>
-            <View style={styles.moodLegendRow}>
-              <Text style={styles.moodLegendLabel}>😔 = Sad</Text>
-              <Text style={styles.moodLegendLabel}>😐 = Neutral</Text>
-              <Text style={styles.moodLegendLabel}>🙂 = Happy</Text>
-            </View>
+        {/* Mood Scale Explanation */}
+        <View style={styles.moodLegendWrapper}>
+          <Text style={styles.moodLegendTitle}>Mood Scale:</Text>
+          <View style={styles.moodLegendRow}>
+            <Text style={styles.moodLegendLabel}>😔 = Sad</Text>
+            <Text style={styles.moodLegendLabel}>😐 = Neutral</Text>
+            <Text style={styles.moodLegendLabel}>🙂 = Happy</Text>
           </View>
-        </ScrollView>
-      </ImageBackground>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

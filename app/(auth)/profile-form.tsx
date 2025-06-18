@@ -2,7 +2,6 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,9 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useBackgroundColor } from '../../app/_layout';
 import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
 import { profileFormStyles as styles } from './profile-form.styles';
+
+const BG_COLORS = ['#FCE4EC', '#F3E5F5', '#E1F5FE', '#E8F5E9', '#FFFDE7'];
 
 export default function ProfileForm() {
   const [fullName, setFullName] = useState('');
@@ -23,6 +25,9 @@ export default function ProfileForm() {
   const [profileSuccess, setProfileSuccess] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const router = useRouter();
+  const { backgroundColor, setBackgroundColor } = useBackgroundColor();
+
+  console.log('Profile form backgroundColor:', backgroundColor);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -158,93 +163,116 @@ export default function ProfileForm() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardAvoidingView}
+      style={[styles.keyboardAvoidingView, { backgroundColor }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-      <ImageBackground
-        source={require('../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
+      <ScrollView
+        contentContainerStyle={[styles.scrollContainer, { backgroundColor }]}
+        keyboardShouldPersistTaps='handled'
+        style={{ backgroundColor }}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps='handled'
-        >
-          <View style={styles.container}>
-            <View style={styles.headerSection}>
-              <WellMindLogo width={120} height={120} style={styles.logo} />
-              <Text style={styles.title}>Account Settings</Text>
-              <Text style={styles.subtitle}>
-                Manage your profile and security
-              </Text>
-            </View>
+        <View style={[styles.container]}>
+          <View style={styles.headerSection}>
+            <WellMindLogo width={120} height={120} style={styles.logo} />
+            <Text style={styles.title}>Account Settings</Text>
+            <Text style={styles.subtitle}>
+              Manage your profile and security
+            </Text>
+          </View>
 
-            <View style={styles.formSection}>
-              <TextInput
-                style={styles.input}
-                placeholder='Full Name'
-                placeholderTextColor='#999'
-                onChangeText={setFullName}
-                value={fullName}
-                autoCapitalize='words'
-                autoComplete='name'
-              />
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handleSaveProfile}
-              >
-                <Text style={styles.buttonText}>Save Profile</Text>
-              </TouchableOpacity>
-              {profileSuccess ? (
-                <Text style={styles.successText}>{profileSuccess}</Text>
-              ) : null}
-            </View>
+          <View style={styles.formSection}>
+            <TextInput
+              style={styles.input}
+              placeholder='Full Name'
+              placeholderTextColor='#999'
+              onChangeText={setFullName}
+              value={fullName}
+              autoCapitalize='words'
+              autoComplete='name'
+            />
+            <TouchableOpacity style={styles.button} onPress={handleSaveProfile}>
+              <Text style={styles.buttonText}>Save Profile</Text>
+            </TouchableOpacity>
+            {profileSuccess ? (
+              <Text style={styles.successText}>{profileSuccess}</Text>
+            ) : null}
+          </View>
 
-            <View style={styles.divider} />
+          <View style={styles.divider} />
 
-            <View style={styles.formSection}>
-              <TextInput
-                style={styles.input}
-                placeholder='New Password (min 6 characters)'
-                placeholderTextColor='#999'
-                secureTextEntry
-                onChangeText={setNewPassword}
-                value={newPassword}
-              />
-              {passwordError ? (
-                <Text style={styles.errorText}>{passwordError}</Text>
-              ) : null}
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handleChangePassword}
-              >
-                <Text style={styles.buttonText}>Change Password</Text>
-              </TouchableOpacity>
-              {passwordSuccess ? (
-                <Text style={styles.successText}>{passwordSuccess}</Text>
-              ) : null}
-            </View>
+          <View style={styles.formSection}>
+            <TextInput
+              style={styles.input}
+              placeholder='New Password (min 6 characters)'
+              placeholderTextColor='#999'
+              secureTextEntry
+              onChangeText={setNewPassword}
+              value={newPassword}
+            />
+            {passwordError ? (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            ) : null}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleChangePassword}
+            >
+              <Text style={styles.buttonText}>Change Password</Text>
+            </TouchableOpacity>
+            {passwordSuccess ? (
+              <Text style={styles.successText}>{passwordSuccess}</Text>
+            ) : null}
+          </View>
 
-            <View style={styles.divider} />
+          <View style={styles.divider} />
 
-            <View style={styles.actionSection}>
-              <TouchableOpacity
-                style={[styles.button, styles.logoutButton]}
-                onPress={handleLogout}
-              >
-                <Text style={styles.buttonText}>🚪 Logout</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.dangerButton]}
-                onPress={handleDeleteAccount}
-              >
-                <Text style={styles.buttonText}>❌ Delete Account</Text>
-              </TouchableOpacity>
+          <View style={styles.formSection}>
+            <Text style={styles.subtitle}>Change Background Color</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                marginVertical: 10,
+              }}
+            >
+              {BG_COLORS.map(color => (
+                <TouchableOpacity
+                  key={color}
+                  style={{
+                    backgroundColor: color,
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    borderWidth: color === backgroundColor ? 3 : 1,
+                    borderColor: color === backgroundColor ? '#007BFF' : '#ddd',
+                  }}
+                  onPress={() => {
+                    console.log(`Setting background color to: ${color}`);
+                    setBackgroundColor(color);
+                  }}
+                />
+              ))}
             </View>
           </View>
-        </ScrollView>
-      </ImageBackground>
+
+          <View style={styles.divider} />
+
+          <View style={styles.actionSection}>
+            <TouchableOpacity
+              style={[styles.button, styles.logoutButton]}
+              onPress={handleLogout}
+            >
+              <Text style={styles.buttonText}>🚪 Logout</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, styles.dangerButton]}
+              onPress={handleDeleteAccount}
+            >
+              <Text style={styles.buttonText}>❌ Delete Account</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

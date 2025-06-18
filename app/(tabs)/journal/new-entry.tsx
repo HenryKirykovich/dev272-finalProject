@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,11 +14,13 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+import { useBackgroundColor } from '../../_layout';
 import { newEntryStyles as styles } from './styles';
 
 export default function NewEntryScreen() {
   const [text, setText] = useState('');
   const router = useRouter();
+  const { backgroundColor } = useBackgroundColor();
 
   const handleSave = async () => {
     // 🚫 Prevent saving empty entries
@@ -55,56 +56,50 @@ export default function NewEntryScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={0} //adjecting GAP between keyboard and typing text
     >
-      <ImageBackground
-        source={require('../../../assets/images/velvet.jpg')}
-        style={styles.background}
-        resizeMode='cover'
-      >
-        <View style={styles.container}>
-          {/* Enhanced Header Section */}
-          <View style={styles.headerSection}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.titleEmoji}>✍️</Text>
-              <Text style={styles.title}>New Entry</Text>
-            </View>
-            <Text style={styles.subtitle}>What&apos;s on your mind?</Text>
+      <View style={[styles.container, { backgroundColor }]}>
+        {/* Enhanced Header Section */}
+        <View style={styles.headerSection}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleEmoji}>✍️</Text>
+            <Text style={styles.title}>New Entry</Text>
+          </View>
+          <Text style={styles.subtitle}>What&apos;s on your mind?</Text>
+        </View>
+
+        {/* Content Section */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps='handled'
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Input Container */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={text}
+              onChangeText={setText}
+              placeholder='Type your thoughts here...'
+              placeholderTextColor='rgba(255, 255, 255, 0.7)'
+              style={styles.input}
+              multiline
+            />
           </View>
 
-          {/* Content Section */}
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps='handled'
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Input Container */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={text}
-                onChangeText={setText}
-                placeholder='Type your thoughts here...'
-                placeholderTextColor='rgba(255, 255, 255, 0.7)'
-                style={styles.input}
-                multiline
-              />
-            </View>
+          {/* Action Buttons */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>💾 Save Entry</Text>
+            </TouchableOpacity>
 
-            {/* Action Buttons */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.saveButtonText}>💾 Save Entry</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-                <Text style={styles.backButtonText}>← Back</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </View>
-      </ImageBackground>
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+              <Text style={styles.backButtonText}>← Back</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 }

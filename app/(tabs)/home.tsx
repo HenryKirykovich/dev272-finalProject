@@ -5,7 +5,6 @@
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
-    ImageBackground,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -16,12 +15,14 @@ import {
 
 import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
+import { useBackgroundColor } from '../_layout';
 import { homeScreenStyles as styles } from './home.styles';
 
 export default function HomeScreen() {
     const [selectedMood, setSelectedMood] = useState('');
     const [mainGoal, setMainGoal] = useState<string | null>(null);
     const [userName, setUserName] = useState('');
+    const { backgroundColor } = useBackgroundColor();
 
     const today = new Date().toISOString().split('T')[0];
     const todayISO = new Date(today).toISOString();
@@ -130,68 +131,63 @@ export default function HomeScreen() {
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1 }}
+            style={{ flex: 1, backgroundColor }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            <ImageBackground
-                source={require('../../assets/images/velvet.jpg')}
-                style={styles.background}
-                resizeMode='cover'
+            <ScrollView
+                contentContainerStyle={[styles.container, { backgroundColor }]}
+                keyboardShouldPersistTaps='handled'
+                showsVerticalScrollIndicator={false}
+                style={{ backgroundColor }}
             >
-                <ScrollView
-                    contentContainerStyle={styles.container}
-                    keyboardShouldPersistTaps='handled'
-                    showsVerticalScrollIndicator={false}
-                >
-                    {/* HEADER */}
-                    <View style={styles.headerSection}>
-                        <View style={styles.logoWrapper}>
-                            <WellMindLogo width={140} height={140} />
-                            <Text style={styles.title}>WellMind</Text>
-                            <Text style={styles.subtitle}>
-                                {userName
-                                    ? `Welcome back, ${userName}!`
-                                    : 'Your mental wellness center'}
-                            </Text>
-                        </View>
+                {/* HEADER */}
+                <View style={styles.headerSection}>
+                    <View style={styles.logoWrapper}>
+                        <WellMindLogo width={140} height={140} />
+                        <Text style={styles.title}>WellMind</Text>
+                        <Text style={styles.subtitle}>
+                            {userName
+                                ? `Welcome back, ${userName}!`
+                                : 'Your mental wellness center'}
+                        </Text>
                     </View>
+                </View>
 
-                    <View style={styles.contentSection}>
-                        {mainGoal && (
-                            <View style={styles.goalBox}>
-                                <Text style={styles.goalText}>🎯 Today's Goal: {mainGoal}</Text>
-                            </View>
-                        )}
+                <View style={styles.contentSection}>
+                    {mainGoal && (
+                        <View style={styles.goalBox}>
+                            <Text style={styles.goalText}>🎯 Today's Goal: {mainGoal}</Text>
+                        </View>
+                    )}
 
-                        <View style={styles.moodSection}>
-                            <Text style={styles.moodPrompt}>How are you feeling today?</Text>
-                            <View style={styles.emojiRow}>
-                                {['😔', '😐', '🙂'].map(emoji => (
-                                    <TouchableOpacity
-                                        key={emoji}
-                                        onPress={() => handleMoodSelect(emoji)}
+                    <View style={styles.moodSection}>
+                        <Text style={styles.moodPrompt}>How are you feeling today?</Text>
+                        <View style={styles.emojiRow}>
+                            {['😔', '😐', '🙂'].map(emoji => (
+                                <TouchableOpacity
+                                    key={emoji}
+                                    onPress={() => handleMoodSelect(emoji)}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.emoji,
+                                            selectedMood === emoji && styles.emojiSelected,
+                                        ]}
                                     >
-                                        <Text
-                                            style={[
-                                                styles.emoji,
-                                                selectedMood === emoji && styles.emojiSelected,
-                                            ]}
-                                        >
-                                            {emoji}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-
-                            {selectedMood && (
-                                <Text style={styles.moodLabel}>
-                                    {moodDescription[selectedMood]}
-                                </Text>
-                            )}
+                                        {emoji}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
                         </View>
+
+                        {selectedMood && (
+                            <Text style={styles.moodLabel}>
+                                {moodDescription[selectedMood]}
+                            </Text>
+                        )}
                     </View>
-                </ScrollView>
-            </ImageBackground>
+                </View>
+            </ScrollView>
         </KeyboardAvoidingView>
     );
 }
