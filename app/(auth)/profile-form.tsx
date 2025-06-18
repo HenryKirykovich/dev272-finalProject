@@ -19,6 +19,9 @@ export default function ProfileForm() {
   const [fullName, setFullName] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [alreadyExists, setAlreadyExists] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [profileSuccess, setProfileSuccess] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -80,25 +83,35 @@ export default function ProfileForm() {
     if (profileError) {
       Alert.alert('Error', profileError.message);
     } else {
-      Alert.alert('✅ Success', 'Profile updated successfully!');
+      setProfileSuccess('✅ Profile updated successfully!');
+      setTimeout(() => setProfileSuccess(''), 4000);
       setFullName('');
     }
   };
 
   const handleChangePassword = async () => {
-    if (newPassword.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters.');
+    if (newPassword.trim() === '') {
+      setPasswordError('Password cannot be empty');
       return;
     }
 
-    const response = await supabase.auth.updateUser({ password: newPassword });
-
-    if (response.error) {
-      Alert.alert('Error', response.error.message);
-    } else {
-      Alert.alert('✅ Success', 'Password changed successfully!');
-      setNewPassword('');
+    if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      return;
     }
+    setPasswordError('');
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      setPasswordError(error.message || 'Unable to change password');
+      return;
+    }
+
+    // Success path
+    setNewPassword('');
+    setPasswordSuccess('✅ Password changed successfully!');
+    setTimeout(() => setPasswordSuccess(''), 4000);
   };
 
   const handleDeleteAccount = async () => {
@@ -172,14 +185,28 @@ export default function ProfileForm() {
               <Text style={styles.buttonText}>Save Profile</Text>
             </TouchableOpacity>
 
+            {profileSuccess !== '' && (
+              <Text style={styles.successText}>{profileSuccess}</Text>
+            )}
+
             <TextInput
               style={styles.input}
               placeholder='New Password (min 6 characters)'
               placeholderTextColor='#999'
               secureTextEntry
-              onChangeText={setNewPassword}
+              onChangeText={text => {
+                setNewPassword(text);
+                if (text.length < 6) {
+                  setPasswordError('Password must be at least 6 characters');
+                } else {
+                  setPasswordError('');
+                }
+              }}
               value={newPassword}
             />
+            {passwordError !== '' && (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            )}
 
             <TouchableOpacity
               style={styles.button}
@@ -187,6 +214,10 @@ export default function ProfileForm() {
             >
               <Text style={styles.buttonText}>Change Password</Text>
             </TouchableOpacity>
+
+            {passwordSuccess !== '' && (
+              <Text style={styles.successText}>{passwordSuccess}</Text>
+            )}
 
             <TouchableOpacity
               style={styles.danger}
@@ -265,5 +296,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  successText: {
+    color: 'green',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
