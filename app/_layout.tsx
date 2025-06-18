@@ -44,10 +44,13 @@ export default function RootLayout() {
         router.replace('/(auth)/login');
       }
     }
-    // If logged in and navigating to an auth screen, redirect to main home
+    // If logged in and navigating to login or register, redirect to home
     if (isLoggedIn === true) {
       const first = segments[0];
-      if (first === '(auth)') {
+      const second = segments[1];
+      const inAuthGroup = first === '(auth)';
+      const isAuthEntry = second === 'login' || second === 'register';
+      if (inAuthGroup && isAuthEntry) {
         router.replace('/(main)/wellmind');
       }
     }
