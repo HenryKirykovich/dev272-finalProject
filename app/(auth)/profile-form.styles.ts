@@ -8,8 +8,6 @@ export const profileFormStyles = StyleSheet.create({
         flex: 1,
     },
     scrollContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
         padding: 16,
     },
     container: {
@@ -99,5 +97,6 @@ export const profileFormStyles = StyleSheet.create({
     },
     actionSection: {
         marginTop: 16,
+        marginBottom: 60,
     },
 });
