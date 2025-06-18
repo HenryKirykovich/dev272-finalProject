@@ -7,6 +7,7 @@
     "icon": "./assets/images/WellMind.png",
     "scheme": "wellmind",
     "userInterfaceStyle": "automatic",
+    "primaryColor": "#F48FB1",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -37,7 +38,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/WellMind.png",
-          "imageWidth": 200,
+          "imageWidth": 512,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
