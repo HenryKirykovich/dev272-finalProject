@@ -21,15 +21,14 @@ const BackgroundColorContext = createContext<
 >(undefined);
 
 const BackgroundColorProvider = ({ children }: { children: ReactNode }) => {
-  const [backgroundColor, setBackgroundColor] = useState('#00FF00'); // Bright green for testing
+  const [backgroundColor, setBackgroundColor] = useState('#F48FB1'); // Default color
 
   useEffect(() => {
     const loadBackgroundColor = async () => {
-      // Temporarily disable loading from storage for testing
-      // const storedColor = await AsyncStorage.getItem('backgroundColor');
-      // if (storedColor) {
-      //   setBackgroundColor(storedColor);
-      // }
+      const storedColor = await AsyncStorage.getItem('backgroundColor');
+      if (storedColor) {
+        setBackgroundColor(storedColor);
+      }
     };
     loadBackgroundColor();
   }, []);
