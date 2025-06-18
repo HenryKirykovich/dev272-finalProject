@@ -126,41 +126,6 @@ export default function ProfileForm() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    Alert.alert(
-      'Are you sure?',
-      'This action is irreversible and will permanently delete your account and all associated data.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete My Account',
-          style: 'destructive',
-          onPress: async () => {
-            const {
-              data: { user },
-            } = await supabase.auth.getUser();
-            if (!user) return;
-
-            // This requires a server-side function with admin privileges
-            // For now, we attempt what's possible from the client-side
-            const { error } = await supabase.rpc('delete_user');
-
-            if (error) {
-              Alert.alert('Error Deleting Account', error.message);
-            } else {
-              Alert.alert(
-                'Account Deleted',
-                'Your account has been successfully deleted.'
-              );
-              await supabase.auth.signOut();
-              router.replace('/(auth)/login');
-            }
-          },
-        },
-      ]
-    );
-  };
-
   return (
     <KeyboardAvoidingView
       style={[styles.keyboardAvoidingView, { backgroundColor }]}
@@ -263,12 +228,6 @@ export default function ProfileForm() {
               onPress={handleLogout}
             >
               <Text style={styles.buttonText}>🚪 Logout</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.dangerButton]}
-              onPress={handleDeleteAccount}
-            >
-              <Text style={styles.buttonText}>❌ Delete Account</Text>
             </TouchableOpacity>
           </View>
         </View>
