@@ -21,6 +21,7 @@ import { homeScreenStyles as styles } from './home.styles';
 export default function HomeScreen() {
     const [selectedMood, setSelectedMood] = useState('');
     const [mainGoal, setMainGoal] = useState<string | null>(null);
+    const [userName, setUserName] = useState('');
 
     const today = new Date().toISOString().split('T')[0];
     const todayISO = new Date(today).toISOString();
@@ -28,6 +29,7 @@ export default function HomeScreen() {
     const loadData = useCallback(() => {
         loadTodayMood();
         loadMainGoal();
+        loadUserName();
     }, []);
 
     useFocusEffect(
@@ -35,6 +37,24 @@ export default function HomeScreen() {
             loadData();
         }, [loadData])
     );
+
+    const loadUserName = async () => {
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+            const { data } = await supabase
+                .from('users')
+                .select('full_name')
+                .eq('id', user.id)
+                .single();
+
+            if (data) {
+                setUserName(data.full_name || '');
+            }
+        }
+    };
 
     const loadTodayMood = async () => {
         const {
@@ -128,7 +148,11 @@ export default function HomeScreen() {
                         <View style={styles.logoWrapper}>
                             <WellMindLogo width={140} height={140} />
                             <Text style={styles.title}>WellMind</Text>
-                            <Text style={styles.subtitle}>Your mental wellness center</Text>
+                            <Text style={styles.subtitle}>
+                                {userName
+                                    ? `Welcome back, ${userName}!`
+                                    : 'Your mental wellness center'}
+                            </Text>
                         </View>
                     </View>
 
@@ -142,7 +166,7 @@ export default function HomeScreen() {
                         <View style={styles.moodSection}>
                             <Text style={styles.moodPrompt}>How are you feeling today?</Text>
                             <View style={styles.emojiRow}>
-                                {['🙂', '😐', '😔'].map(emoji => (
+                                {['😔', '😐', '🙂'].map(emoji => (
                                     <TouchableOpacity
                                         key={emoji}
                                         onPress={() => handleMoodSelect(emoji)}
