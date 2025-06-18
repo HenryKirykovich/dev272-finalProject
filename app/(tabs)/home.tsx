@@ -15,8 +15,8 @@ import {
 
 import WellMindLogo from '../../assets/images/WellMind.svg';
 import { supabase } from '../../lib/supabase';
+import { homeScreenStyles as styles } from '../../styles/tabs/home.styles';
 import { useBackgroundColor } from '../_layout';
-import { homeScreenStyles as styles } from './home.styles';
 
 export default function HomeScreen() {
     const [selectedMood, setSelectedMood] = useState('');

@@ -13,8 +13,8 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+import { journalScreenStyles as styles } from '../../../styles/tabs/journal.styles';
 import { useBackgroundColor } from '../../_layout';
-import { journalScreenStyles as styles } from './styles';
 
 interface Entry {
   id: string;

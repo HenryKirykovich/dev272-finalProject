@@ -16,8 +16,8 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+import { newGoalStyles as styles } from '../../../styles/tabs/goals.styles';
 import { useBackgroundColor } from '../../_layout';
-import { newGoalStyles as styles } from './styles';
 
 export default function NewGoalScreen() {
   const [goal, setGoal] = useState('');

@@ -15,8 +15,8 @@ import {
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { supabase } from '../../lib/supabase';
+import { moodGraphStyles as styles } from '../../styles/tabs/mood-graph.styles';
 import { useBackgroundColor } from '../_layout';
-import { moodGraphStyles as styles } from './mood-graph.styles';
 
 // Converts mood emoji string to a numeric value for graph plotting
 function mapMoodToValue(mood: string): number {

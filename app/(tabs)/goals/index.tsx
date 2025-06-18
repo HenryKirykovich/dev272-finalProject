@@ -13,8 +13,8 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+import { goalsScreenStyles as styles } from '../../../styles/tabs/goals.styles';
 import { useBackgroundColor } from '../../_layout';
-import { goalsScreenStyles as styles } from './styles';
 
 interface Goal {
   id: string;

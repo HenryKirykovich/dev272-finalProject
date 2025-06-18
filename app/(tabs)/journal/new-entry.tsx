@@ -15,8 +15,8 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+import { newEntryStyles as styles } from '../../../styles/tabs/journal.styles';
 import { useBackgroundColor } from '../../_layout';
-import { newEntryStyles as styles } from './styles';
 
 export default function NewEntryScreen() {
   const [text, setText] = useState('');

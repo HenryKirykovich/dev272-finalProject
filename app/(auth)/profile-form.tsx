@@ -14,7 +14,7 @@ import {
 import { useBackgroundColor } from '../../app/_layout';
 import WellMindLogo from '../../assets/images/WellMind.svg';
 import { supabase } from '../../lib/supabase';
-import { profileFormStyles as styles } from './profile-form.styles';
+import { profileFormStyles as styles } from '../../styles/auth/profile-form.styles';
 
 const BG_COLORS = ['#F48FB1', '#CE93D8', '#90CAF9', '#A5D6A7', '#FFE082'];
 
