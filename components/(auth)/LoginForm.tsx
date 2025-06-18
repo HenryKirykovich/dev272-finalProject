@@ -2,7 +2,7 @@
 // Login screen for user authentication with Supabase
 
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -27,6 +27,15 @@ export default function LoginForm() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const router = useRouter();
+
+  // Redirect already authenticated users to main page
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        router.replace('/(main)/wellmind');
+      }
+    });
+  }, []);
 
   // Validates email with regex
   const validateEmail = (email: string) => {

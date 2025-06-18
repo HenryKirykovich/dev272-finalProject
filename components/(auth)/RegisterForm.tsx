@@ -2,7 +2,7 @@
 // Registration screen for new users using Supabase authentication
 
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   ImageBackground,
@@ -30,6 +30,15 @@ export default function RegisterForm() {
   const [fullName, setFullName] = useState('');
   const [nameError, setNameError] = useState('');
   const router = useRouter();
+
+  // Redirect already authenticated users to main page
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        router.replace('/(main)/wellmind');
+      }
+    });
+  }, []);
 
   // Email validation function
   const validateEmail = (email: string) => {

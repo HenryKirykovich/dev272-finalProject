@@ -25,13 +25,23 @@ export default function RootLayout() {
     });
 
     // Optional: handle notification received while app is in foreground
-    const subscription = Notifications.addNotificationReceivedListener(
+    const notificationSub = Notifications.addNotificationReceivedListener(
       notification => {
         console.log('Notification Received:', notification);
       }
     );
 
-    return () => subscription.remove();
+    // Listen to future auth state changes to keep login status accurate
+    const {
+      data: { subscription: authSub },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => {
+      notificationSub.remove();
+      authSub.unsubscribe();
+    };
   }, []);
 
   // Guard: if not logged in and navigating outside login/register, redirect to login
@@ -47,6 +57,13 @@ export default function RootLayout() {
 
       if (!isAllowedAuthScreen) {
         router.replace('/(auth)/login');
+      }
+    }
+    // If logged in and navigating to an auth screen, redirect to main home
+    if (isLoggedIn === true) {
+      const first = segments[0];
+      if (first === '(auth)') {
+        router.replace('/(main)/wellmind');
       }
     }
   }, [segments, isLoggedIn]);
