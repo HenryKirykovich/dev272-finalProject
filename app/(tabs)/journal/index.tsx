@@ -8,12 +8,12 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+import { journalScreenStyles as styles } from './styles';
 
 interface Entry {
   id: string;
@@ -99,19 +99,33 @@ export default function JournalScreen() {
         resizeMode='cover'
       >
         <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.headerRow}>
-            <Text style={styles.title}>My Journal</Text>
+          {/* Enhanced Header Section */}
+          <View style={styles.headerSection}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleEmoji}>📖</Text>
+              <Text style={styles.title}>My Journal</Text>
+            </View>
           </View>
 
-          {/* List of entries */}
-          <FlatList
-            data={entries}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            showsVerticalScrollIndicator={false}
-          />
+          {/* Entries Content */}
+          <View style={styles.contentSection}>
+            {entries.length === 0 ? (
+              <View style={styles.emptyStateContainer}>
+                <Text style={styles.emptyStateText}>No entries yet</Text>
+                <Text style={styles.emptyStateSubtext}>
+                  Tap the + button to create your first journal entry.
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={entries}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.listContentContainer}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
+          </View>
 
           {/* Floating plus button */}
           <TouchableOpacity
@@ -125,58 +139,3 @@ export default function JournalScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-// 🎨 Styles
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  entryBox: {
-    backgroundColor: '#f2e9f4',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-  },
-  entryDate: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6a4c93',
-    marginBottom: 4,
-  },
-  entryText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  floatingAddButton: {
-    position: 'absolute',
-    bottom: 90 /* above tab bar */,
-    alignSelf: 'center',
-    backgroundColor: '#6a66a3',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
