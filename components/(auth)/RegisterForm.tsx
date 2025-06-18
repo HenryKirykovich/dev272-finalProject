@@ -32,8 +32,6 @@ export default function RegisterForm() {
   const router = useRouter();
   const { backgroundColor } = useBackgroundColor();
 
-  console.log('Register form backgroundColor:', backgroundColor);
-
   // Validates email format
   const validateEmail = (email: string) => {
     if (!emailRegex.test(email)) {

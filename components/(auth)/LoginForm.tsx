@@ -29,8 +29,6 @@ export default function LoginForm() {
   const router = useRouter();
   const { backgroundColor } = useBackgroundColor();
 
-  console.log('Login form backgroundColor:', backgroundColor);
-
   // Redirect already authenticated users to main page
   useEffect(() => {
     supabase.auth.onAuthStateChange((_event, session) => {
