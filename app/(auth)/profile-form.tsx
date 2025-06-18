@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -14,6 +13,7 @@ import {
 } from 'react-native';
 import WellMindLogo from '../../assets/images/WellMind_logo_svg.svg';
 import { supabase } from '../../lib/supabase';
+import { profileFormStyles as styles } from './profile-form.styles';
 
 export default function ProfileForm() {
   const [fullName, setFullName] = useState('');
@@ -31,7 +31,6 @@ export default function ProfileForm() {
         error: userError,
       } = await supabase.auth.getUser();
 
-      // If not authenticated, redirect to login page
       if (!user || userError) {
         router.replace('/(auth)/login');
         return;
@@ -53,6 +52,7 @@ export default function ProfileForm() {
   }, []);
 
   const handleSaveProfile = async () => {
+    setProfileSuccess('');
     if (!fullName.trim()) {
       Alert.alert('Error', 'Full Name cannot be empty.');
       return;
@@ -84,10 +84,12 @@ export default function ProfileForm() {
       Alert.alert('Error', profileError.message);
     } else {
       setProfileSuccess('✅ Profile updated successfully!');
+      setTimeout(() => setProfileSuccess(''), 4000);
     }
   };
 
   const handleChangePassword = async () => {
+    setPasswordSuccess('');
     if (newPassword.trim() === '') {
       setPasswordError('Password cannot be empty');
       return;
@@ -103,13 +105,11 @@ export default function ProfileForm() {
 
     if (error) {
       setPasswordError(error.message || 'Unable to change password');
-      return;
+    } else {
+      setNewPassword('');
+      setPasswordSuccess('✅ Password changed successfully!');
+      setTimeout(() => setPasswordSuccess(''), 4000);
     }
-
-    // Success path
-    setNewPassword('');
-    setPasswordSuccess('✅ Password changed successfully!');
-    setTimeout(() => setPasswordSuccess(''), 4000);
   };
 
   const handleLogout = async () => {
@@ -122,197 +122,129 @@ export default function ProfileForm() {
   };
 
   const handleDeleteAccount = async () => {
-    Alert.alert('Are you sure?', 'This will permanently delete your account.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
-          if (!user) return;
+    Alert.alert(
+      'Are you sure?',
+      'This action is irreversible and will permanently delete your account and all associated data.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete My Account',
+          style: 'destructive',
+          onPress: async () => {
+            const {
+              data: { user },
+            } = await supabase.auth.getUser();
+            if (!user) return;
 
-          const { error: dbError } = await supabase
-            .from('users')
-            .delete()
-            .eq('id', user.id);
-          const { error: authError } = await supabase.auth.admin.deleteUser(
-            user.id
-          );
+            // This requires a server-side function with admin privileges
+            // For now, we attempt what's possible from the client-side
+            const { error } = await supabase.rpc('delete_user');
 
-          if (dbError || authError) {
-            Alert.alert(
-              'Error',
-              dbError?.message || authError?.message || 'Unknown error'
-            );
-          } else {
-            Alert.alert('Deleted', 'Your account has been deleted');
-            router.replace('/(auth)/login');
-          }
+            if (error) {
+              Alert.alert('Error Deleting Account', error.message);
+            } else {
+              Alert.alert(
+                'Account Deleted',
+                'Your account has been successfully deleted.'
+              );
+              await supabase.auth.signOut();
+              router.replace('/(auth)/login');
+            }
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={styles.keyboardAvoidingView}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={80}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <ImageBackground
         source={require('../../assets/images/velvet.jpg')}
-        style={{ flex: 1 }}
+        style={styles.background}
         resizeMode='cover'
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps='handled'
         >
           <View style={styles.container}>
-            <View style={styles.logoWrapper}>
-              <WellMindLogo width={120} height={120} />
-              <Text style={[styles.title, { color: '#000' }]}>WellMind</Text>
-              <Text style={[styles.subtitle, { color: '#000' }]}>
-                mental health
+            <View style={styles.headerSection}>
+              <WellMindLogo width={120} height={120} style={styles.logo} />
+              <Text style={styles.title}>Account Settings</Text>
+              <Text style={styles.subtitle}>
+                Manage your profile and security
               </Text>
-              <Text style={[styles.subtitle, { color: '#000' }]}>journal</Text>
             </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder='Full Name'
-              placeholderTextColor='#999'
-              onChangeText={setFullName}
-              value={fullName}
-            />
+            <View style={styles.formSection}>
+              <TextInput
+                style={styles.input}
+                placeholder='Full Name'
+                placeholderTextColor='#999'
+                onChangeText={setFullName}
+                value={fullName}
+                autoCapitalize='words'
+                autoComplete='name'
+              />
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleSaveProfile}
+              >
+                <Text style={styles.buttonText}>Save Profile</Text>
+              </TouchableOpacity>
+              {profileSuccess ? (
+                <Text style={styles.successText}>{profileSuccess}</Text>
+              ) : null}
+            </View>
 
-            <TouchableOpacity style={styles.button} onPress={handleSaveProfile}>
-              <Text style={styles.buttonText}>Save Profile</Text>
-            </TouchableOpacity>
+            <View style={styles.divider} />
 
-            {profileSuccess !== '' && (
-              <Text style={styles.successText}>{profileSuccess}</Text>
-            )}
+            <View style={styles.formSection}>
+              <TextInput
+                style={styles.input}
+                placeholder='New Password (min 6 characters)'
+                placeholderTextColor='#999'
+                secureTextEntry
+                onChangeText={setNewPassword}
+                value={newPassword}
+              />
+              {passwordError ? (
+                <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleChangePassword}
+              >
+                <Text style={styles.buttonText}>Change Password</Text>
+              </TouchableOpacity>
+              {passwordSuccess ? (
+                <Text style={styles.successText}>{passwordSuccess}</Text>
+              ) : null}
+            </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder='New Password (min 6 characters)'
-              placeholderTextColor='#999'
-              secureTextEntry
-              onChangeText={text => {
-                setNewPassword(text);
-                if (text.length < 6) {
-                  setPasswordError('Password must be at least 6 characters');
-                } else {
-                  setPasswordError('');
-                }
-              }}
-              value={newPassword}
-            />
-            {passwordError !== '' && (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            )}
+            <View style={styles.divider} />
 
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleChangePassword}
-            >
-              <Text style={styles.buttonText}>Change Password</Text>
-            </TouchableOpacity>
-
-            {passwordSuccess !== '' && (
-              <Text style={styles.successText}>{passwordSuccess}</Text>
-            )}
-
-            <TouchableOpacity
-              style={styles.danger}
-              onPress={handleDeleteAccount}
-            >
-              <Text style={styles.buttonText}>❌ Delete Account</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: '#b5838d' }]}
-              onPress={handleLogout}
-            >
-              <Text style={styles.buttonText}>🚪 Logout</Text>
-            </TouchableOpacity>
+            <View style={styles.actionSection}>
+              <TouchableOpacity
+                style={[styles.button, styles.logoutButton]}
+                onPress={handleLogout}
+              >
+                <Text style={styles.buttonText}>🚪 Logout</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.dangerButton]}
+                onPress={handleDeleteAccount}
+              >
+                <Text style={styles.buttonText}>❌ Delete Account</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
       </ImageBackground>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    borderRadius: 18,
-    margin: 16,
-  },
-  logoWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-    width: '100%',
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#000',
-    textAlign: 'center',
-    marginBottom: 2,
-    marginTop: 16,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#000',
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  input: {
-    height: 48,
-    backgroundColor: '#fff',
-    color: '#333',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#e0d6e2',
-  },
-  button: {
-    backgroundColor: '#6a66a3',
-    paddingVertical: 14,
-    borderRadius: 18,
-    marginBottom: 20,
-    marginTop: 10,
-  },
-  danger: {
-    backgroundColor: '#aa3333',
-    paddingVertical: 12,
-    borderRadius: 16,
-    marginBottom: 20,
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  successText: {
-    color: 'green',
-    marginBottom: 8,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-});
