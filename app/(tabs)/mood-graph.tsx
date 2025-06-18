@@ -10,13 +10,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { supabase } from '../../lib/supabase';
+import { moodGraphStyles as styles } from './mood-graph.styles';
 
 // Converts mood emoji string to a numeric value for graph plotting
 function mapMoodToValue(mood: string): number {
@@ -46,18 +46,22 @@ export default function MoodGraphScreen() {
 
   // Fetch mood logs from Supabase for the selected date range
   const fetchMoodLogs = useCallback(async () => {
+    setLoading(true);
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     let dateFrom = new Date();
     if (range === 'week') {
-      dateFrom.setDate(dateFrom.getDate() - 6);
+      dateFrom.setDate(dateFrom.getDate() - 7);
     } else if (range === 'month') {
       dateFrom.setMonth(dateFrom.getMonth() - 1);
     } else {
-      dateFrom = new Date('2024-01-01'); // full history fallback
+      dateFrom = new Date(0); // Full history
     }
 
     const { data, error } = await supabase
@@ -80,7 +84,7 @@ export default function MoodGraphScreen() {
   // Fetch data when range changes
   useEffect(() => {
     fetchMoodLogs();
-  }, [range, fetchMoodLogs]);
+  }, [range]);
 
   // Refetch data each time screen is focused
   useFocusEffect(
@@ -89,17 +93,19 @@ export default function MoodGraphScreen() {
     }, [fetchMoodLogs])
   );
 
-  // Reduce labels for wider datasets (month/all)
+  // Reduce labels for wider datasets (month/all) to prevent clutter
   const reducedLabels = labels.map((label, i, arr) => {
-    if (range === 'week') return label;
+    if (arr.length <= 7) return label; // Show all for a week or less
     if (range === 'month') {
       const mid = Math.floor(arr.length / 2);
+      // Show first, middle, and last labels
       return i === 0 || i === mid || i === arr.length - 1 ? label : '';
     }
     if (range === 'all') {
+      // Show only first and last
       return i === 0 || i === arr.length - 1 ? label : '';
     }
-    return '';
+    return label; // Default to showing label if logic gets complex
   });
 
   return (
@@ -112,55 +118,54 @@ export default function MoodGraphScreen() {
         style={styles.background}
         resizeMode='cover'
       >
-        <View style={styles.container}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps='handled'
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Header */}
-            <View style={styles.textBgWrapper}>
-              <ImageBackground
-                source={require('../../assets/images/velvet3.png')}
-                style={StyleSheet.absoluteFillObject}
-                imageStyle={{ opacity: 0.5, borderRadius: 16 }}
-                resizeMode='cover'
-              />
-              <View style={styles.textBgContent}>
-                <Text style={styles.title}>Mood Chart</Text>
-                <Text style={styles.subtitle}>Track your mood over time</Text>
-              </View>
+        <ScrollView
+          style={styles.scrollContent}
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.headerSection}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleEmoji}>📈</Text>
+              <Text style={styles.title}>Mood Chart</Text>
             </View>
+            <Text style={styles.subtitle}>Track your mood over time</Text>
+          </View>
 
-            {/* Range Selector */}
-            <View style={{ flexDirection: 'row', marginBottom: 12 }}>
-              {['week', 'month', 'all'].map(r => (
-                <TouchableOpacity
-                  key={r}
-                  style={[
-                    styles.rangeButton,
-                    range === r && styles.rangeButtonSelected,
-                  ]}
-                  onPress={() => setRange(r as any)}
+          {/* Range Selector */}
+          <View style={styles.rangeSelectorContainer}>
+            {['week', 'month', 'all'].map(r => (
+              <TouchableOpacity
+                key={r}
+                style={[
+                  styles.rangeButton,
+                  range === r && styles.rangeButtonSelected,
+                ]}
+                onPress={() => setRange(r as any)}
+              >
+                <Text
+                  style={
+                    range === r
+                      ? styles.rangeButtonTextSelected
+                      : styles.rangeButtonText
+                  }
                 >
-                  <Text
-                    style={
-                      range === r
-                        ? styles.rangeButtonTextSelected
-                        : styles.rangeButtonText
-                    }
-                  >
-                    {r.charAt(0).toUpperCase() + r.slice(1)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-            {/* Mood Chart */}
+          {/* Mood Chart */}
+          <View style={styles.chartWrapper}>
             {loading ? (
-              <ActivityIndicator size='large' style={{ marginTop: 60 }} />
+              <ActivityIndicator
+                size='large'
+                style={styles.loadingIndicator}
+                color='#6a66a3'
+              />
             ) : values.length === 0 ? (
-              <Text style={{ color: '#000' }}>No data for selected range</Text>
+              <Text style={styles.noDataText}>No data for selected range</Text>
             ) : (
               <LineChart
                 data={{
@@ -202,91 +207,19 @@ export default function MoodGraphScreen() {
                 }}
               />
             )}
+          </View>
 
-            {/* Mood Scale Explanation */}
-            <View style={styles.moodLegendWrapper}>
-              <Text style={styles.moodLegendTitle}>Mood Scale:</Text>
-              <View style={styles.moodLegendRow}>
-                <Text style={styles.moodLegendLabel}>😐 = Sad</Text>
-                <Text style={styles.moodLegendLabel}>😔 = Neutral</Text>
-                <Text style={styles.moodLegendLabel}>🙂 = Happy</Text>
-              </View>
+          {/* Mood Scale Explanation */}
+          <View style={styles.moodLegendWrapper}>
+            <Text style={styles.moodLegendTitle}>Mood Scale:</Text>
+            <View style={styles.moodLegendRow}>
+              <Text style={styles.moodLegendLabel}>😔 = Sad</Text>
+              <Text style={styles.moodLegendLabel}>😐 = Neutral</Text>
+              <Text style={styles.moodLegendLabel}>🙂 = Happy</Text>
             </View>
-          </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
       </ImageBackground>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  background: { flex: 1 },
-  container: { flex: 1, justifyContent: 'space-between', padding: 20 },
-  scrollContent: { flexGrow: 1, alignItems: 'center' },
-  textBgWrapper: {
-    position: 'relative',
-    marginBottom: 24,
-    borderRadius: 16,
-    overflow: 'hidden',
-    minHeight: 180,
-    justifyContent: 'center',
-    width: '100%',
-  },
-  textBgContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    zIndex: 1,
-  },
-  title: { fontSize: 30, fontWeight: 'bold', color: '#000' },
-  subtitle: { fontSize: 16, color: '#000' },
-  rangeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginHorizontal: 4,
-    borderRadius: 12,
-    backgroundColor: '#ffffffcc',
-    borderWidth: 1,
-    borderColor: '#6a66a3',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rangeButtonSelected: {
-    backgroundColor: '#6a66a3',
-  },
-  rangeButtonText: {
-    color: '#6a66a3',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  rangeButtonTextSelected: {
-    color: '#fff',
-  },
-  moodLegendWrapper: {
-    backgroundColor: '#ffffffcc',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    marginTop: 20,
-    width: '100%',
-    alignItems: 'center',
-  },
-  moodLegendTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 6,
-  },
-  moodLegendRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  moodLegendLabel: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 14,
-    color: '#333',
-  },
-});
