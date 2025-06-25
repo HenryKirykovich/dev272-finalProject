@@ -41,6 +41,8 @@ module.exports = defineConfig([
       'no-debugger': 'error',
       'prefer-const': 'error',
       'no-var': 'error',
+      'no-unused-vars': 'warn',
+      'no-empty-function': 'warn',
     },
     ignores: [
       'dist/*',
