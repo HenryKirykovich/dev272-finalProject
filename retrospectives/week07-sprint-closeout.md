@@ -1,4 +1,4 @@
-# Week 6 Sprint Closeout
+# Week 7 Sprint Closeout
 ## Completed tasks
 This week foundation for future development was created. We decided to use Discord as our messaging app. Also, First app designs for flow and interface was created.
 ### Tasks:
