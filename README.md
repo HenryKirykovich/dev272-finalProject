@@ -98,6 +98,31 @@ npm run type-check
 npm run check-all
 ```
 
+### Testing
+
+This project includes comprehensive automated tests using Jest and React Native Testing Library:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage report
+npm test -- --coverage
+
+# Run a specific test file
+npm test -- __tests__/components/LoginForm.test.tsx
+
+# Run tests in watch mode (automatically re-runs on file changes)
+npm test -- --watch
+```
+
+The test suite includes:
+- **Unit Tests**: Testing individual components and functions
+- **Integration Tests**: Testing component interactions
+- **Form Tests**: Testing user input and form validation
+
+Test coverage reports are generated in the `coverage/` directory. Open `coverage/lcov-report/index.html` in your browser to view detailed coverage information.
+
 ### VS Code Setup
 
 For the best development experience with VS Code:
@@ -108,16 +133,25 @@ For the best development experience with VS Code:
 
 ## 🔧 Available Scripts
 
+### Development & Build
 - `npm start` - Start the Expo development server
 - `npm run android` - Run on Android emulator/device
 - `npm run ios` - Run on iOS simulator/device
 - `npm run web` - Run in web browser
+- `npm run reset-project` - Reset the project to initial state
+
+### Testing
+- `npm test` - Run the automated test suite using Jest
+- `npm test -- --coverage` - Run tests with coverage report
+- `npm test -- <test-file>` - Run a specific test file
+
+### Code Quality
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues automatically
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check if code is formatted correctly
 - `npm run type-check` - Run TypeScript type checking
-- `npm run check-all` - Run all quality checks
+- `npm run check-all` - Run all quality checks (type-check, lint, format:check)
 
 ## 🤝 Contributing
 
@@ -125,14 +159,17 @@ For the best development experience with VS Code:
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
 4. Run quality checks (`npm run check-all`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+5. Run tests to ensure everything works (`npm test`)
+6. Commit your changes (`git commit -m 'Add amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
 
 ### Code Style
 
 This project follows strict code formatting and linting rules:
-- Always run `npm run check-all` before committing
+- Always run `npm run check-all` and `npm test` before committing
+- Write tests for new features and bug fixes
+- Maintain test coverage above the minimum threshold (20%)
 - Use meaningful commit messages
 - Follow TypeScript best practices
 - Write self-documenting code
