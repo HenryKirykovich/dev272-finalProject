@@ -2,6 +2,9 @@
 
 A React Native application designed to monitor your mood throughout the day, offering features such as journaling and a to-do list.
 
+## 📊 Presentation
+**Presenation Slides:** [wellmind_presentation.pptx](wellmind_presentation.pptx)
+
 ## 📱 About
 
 This mood monitoring app helps users track their emotional well-being through:
