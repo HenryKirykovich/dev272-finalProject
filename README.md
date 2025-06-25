@@ -9,10 +9,20 @@ A React Native application designed to monitor your mood throughout the day, off
 
 This mood monitoring app helps users track their emotional well-being through:
 - **Mood Tracking**: Monitor your mood throughout the day
+- **Mood Graph**: Visualize your mood trends over time with interactive charts showing daily, weekly, and monthly graphs
 - **Journaling**: Reflect on your thoughts and experiences
 - **To-Do List**: Organize your daily tasks and goals
 
 Built with React Native and Expo for cross-platform compatibility (iOS, Android, and Web).
+
+## 👥 Team Members & Contributions
+
+| Name                | Primary Role         | Secondary Role         | Contribution Description                |
+|---------------------|---------------------|------------------------|------------------------------------------|
+| Henadzi Kirykovich  | Backend Developer   | Frontend Developer     | Created backbones for the entire application, including initial working versions for each page. Also was helping with fixing bugs and polishing the app. |
+| Kyryl Andreiev      | Project Manager     | DevOps                 | Managed the project by assigning tasks and organizing workflows and collaboration. Maintained the development setup, and helping implement part of the app functionality. |
+| Shayla Rohrer       | UI/UX Designer      | Frontend Developer     | Created amazing designs and a logo for the app, providing straightforward requirements and designs to make implementation easy.| 
+| Tri Nguyen          | QA Engineer         | Frontend Developer     | Reviewed most of the code PRs and provided helpful feedback on code quality. Also developed a list of things we should write automatic tests for and provided helpful descriptions on how to implement them. |
 
 ## 🚀 Getting Started
 
@@ -208,3 +218,7 @@ npm run format
 
 - Check the [Expo Documentation](https://docs.expo.dev/)
 - Review [React Native Documentation](https://reactnative.dev/docs/getting-started)
+
+## ⚠️ Limitations
+
+While WellMind is accessible via the web, it is primarily designed and optimized for mobile devices (iOS and Android). The web version is functional, but the user experience may be less polished, with certain layouts, interactions, or features not behaving as smoothly as on mobile. For the best experience, we recommend using WellMind on a mobile device.
